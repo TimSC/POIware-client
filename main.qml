@@ -27,8 +27,12 @@ ApplicationWindow {
 
     PositionSource {
         id: positionSource
+        active: true
+        preferredPositioningMethods: PositionSource.SatellitePositioningMethods
+
         onPositionChanged: {
-            console.log("Position changed" + Location.coordinate);
+            var pos = positionSource.position.coordinate
+            console.log("Position changed: " + pos);
 
         }
     }
@@ -101,10 +105,16 @@ ApplicationWindow {
         {
             var currentLat = 51.2365
             var currentLon = -0.5703
+            var pos = positionSource.position.coordinate
 
-            if(gpxSource.Ready)
+            if(positionSource.position.latitudeValid)
             {
-                console.log("gpxSource ready");
+                currentLat = positionSource.position.coordinate.latitude
+            }
+
+            if(positionSource.position.longitudeValid)
+            {
+                currentLon = positionSource.position.coordinate.longitude
             }
 
             //Calculate distance to each poi
