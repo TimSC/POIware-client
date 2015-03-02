@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx
+  version="1.0"
+  creator="GPSBabel - http://www.gpsbabel.org"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.topografix.com/GPX/1/0"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd">
+<time>2014-10-16T17:52:05Z</time>
+<bounds minlat="27.962489147" minlon="-3.754998241" maxlat="51.301323194" maxlon="121.542146942"/>
+<wpt lat="51.0" lon="-1.0">
+  <ele>13.584351</ele>
+  <name>001</name>
+  <cmt>22-APR-13 8:33:17AM</cmt>
+  <desc>22-APR-13 8:33:17AM</desc>
+  <sym>Flag, Blue</sym>
+</wpt>
+<wpt lat="52.1" lon="0.4">
+  <ele>13.824585</ele>
+  <name>002</name>
+  <cmt>22-APR-13 8:33:19AM</cmt>
+  <desc>22-APR-13 8:33:19AM</desc>
+  <sym>Flag, Blue</sym>
+</wpt>
+<wpt lat="50.9" lon="-1.1">
+  <ele>153.454956</ele>
+  <name>003</name>
+  <cmt>22-APR-13 12:39:11PM</cmt>
+  <desc>22-APR-13 12:39:11PM</desc>
+  <sym>Flag, Blue</sym>
+</wpt>
+</gpx>
+
