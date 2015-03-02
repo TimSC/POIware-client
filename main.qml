@@ -56,6 +56,7 @@ ApplicationWindow {
     MainForm {
         anchors.fill: parent
         nearbyList.model: nearbyModel
+        nearbyList.clip: true
         nearbyList.delegate: Item
         {
             id: container
@@ -101,6 +102,12 @@ ApplicationWindow {
             var currentLat = 51.2365
             var currentLon = -0.5703
 
+            if(gpxSource.Ready)
+            {
+                console.log("gpxSource ready");
+            }
+
+            //Calculate distance to each poi
             var poiList = []
             for(var i=0;i< gpxSource.count; i++)
             {
@@ -113,17 +120,19 @@ ApplicationWindow {
                 poiList.push({"name":item.name, "colorCode": "green", "dist": d})
             }
 
+            //Sort pois by distance
+            poiList.sort(function(a, b){return a["dist"]-b["dist"]})
+
+            //Update the UI model
             nearbyModel.clear()
-            console.log(poiList.length)
             for(var i=0;i< poiList.length; i++)
             {
                 var item = poiList[i]
-                console.log("item" + item)
+                //console.log("item" + item)
                 nearbyModel.append({"name":item["name"], "colorCode": item["colorCode"], "dist": item["dist"]})
             }
         }
 
-        nearbyList.clip: true
     }
 
     MessageDialog {
