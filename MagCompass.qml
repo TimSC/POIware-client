@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtSensors 5.0
 
 Item {
+    id: baseCompass
 
     property real demoHeading
     property int realCompass
@@ -15,7 +16,7 @@ Item {
         onTriggered: {
             demoHeading += 5
             if (realCompass != 1)
-                parent.magChange(demoHeading)
+                baseCompass.magChange(demoHeading)
         }
     }
 
@@ -44,7 +45,7 @@ Item {
             var bearingDeg = bearingRad * 180. / Math.PI
             //console.log("bearingDeg:", bearingDeg);
 
-            parent.magChange(bearingDeg)
+            baseCompass.magChange(bearingDeg)
             realCompass = 1
         }
     }
