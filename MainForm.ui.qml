@@ -9,30 +9,22 @@ Item {
 
     property alias refreshButton: refreshButton
     property alias nearbyList: nearbyList
+    property alias viewButton: viewButton
 
     ColumnLayout {
         id: columnLayout1
         anchors.fill: parent
     }
 
-    Button {
-        id: refreshButton
-        text: qsTr("Refresh")
-        anchors.top: parent.top
-        anchors.topMargin: 5
-        anchors.left: parent.left
-        anchors.leftMargin: 5
-    }
-
     ListView {
         id: nearbyList
         anchors.right: parent.right
         anchors.rightMargin: 5
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 5
+        anchors.bottom: bottomRowLayout.top
+        anchors.bottomMargin: -95
         anchors.left: parent.left
         anchors.leftMargin: 5
-        anchors.top: refreshButton.bottom
+        anchors.top: topRowLayout.bottom
         anchors.topMargin: 5
         model: ListModel {
             ListElement {
@@ -74,6 +66,51 @@ Item {
                 }
                 spacing: 10
             }
+        }
+    }
+
+    RowLayout {
+        id: bottomRowLayout
+        y: 359
+        height: 30
+        anchors.right: parent.right
+        anchors.rightMargin: 0
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 0
+
+        Button {
+            id: viewButton
+            text: qsTr("View")
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+        }
+    }
+
+    RowLayout {
+        id: topRowLayout
+        height: 30
+        anchors.right: parent.right
+        anchors.rightMargin: 0
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        anchors.top: parent.top
+        anchors.topMargin: 0
+
+        Button {
+            id: refreshButton
+            text: qsTr("Refresh")
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            anchors.left: parent.left
+            anchors.leftMargin: 5
         }
     }
 }

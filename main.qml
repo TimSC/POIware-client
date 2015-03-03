@@ -64,6 +64,15 @@ ApplicationWindow {
         nearbyList.clip: true
         nearbyList.highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
         nearbyList.highlightFollowsCurrentItem: true
+
+        function viewPoi() {
+            var index = nearbyList.currentIndex
+            console.log("view poi:" + index);
+
+            poiView.visible = true
+            nearbyForm.visible = false
+        }
+
         nearbyList.delegate: Item
         {
             id: container
@@ -94,6 +103,11 @@ ApplicationWindow {
                     //console.log("test1");
                     container.ListView.view.currentIndex = index
                 }
+
+                onDoubleClicked: {
+                    container.ListView.view.currentIndex = index
+                    nearbyForm.viewPoi()
+                }
             }
         }
 
@@ -103,6 +117,11 @@ ApplicationWindow {
 
         function toDegrees(rad) {
             return rad * 180. / Math.PI;
+        }
+
+        viewButton.onClicked:
+        {
+            viewPoi()
         }
 
         refreshButton.onClicked:
@@ -156,6 +175,16 @@ ApplicationWindow {
         function show(caption) {
             messageDialog.text = caption;
             messageDialog.open();
+        }
+    }
+
+    PoiView {
+        id: poiView
+        visible: false
+        anchors.fill: parent
+        button1.onClicked: {
+            poiView.visible = false
+            nearbyForm.visible = true
         }
     }
 }

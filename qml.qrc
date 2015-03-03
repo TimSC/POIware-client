@@ -3,5 +3,7 @@
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
         <file>test.gpx</file>
+        <file>PoiView.qml</file>
+        <file>PoiViewForm.ui.qml</file>
     </qresource>
 </RCC>
