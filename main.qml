@@ -58,13 +58,16 @@ ApplicationWindow {
     }
 
     MainForm {
+        id: nearbyForm
         anchors.fill: parent
         nearbyList.model: nearbyModel
         nearbyList.clip: true
+        nearbyList.highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
+        nearbyList.highlightFollowsCurrentItem: true
         nearbyList.delegate: Item
         {
             id: container
-            width: 100; height: 40
+            width: nearbyForm.width; height: 40
 
             Row {
                 id: row1
@@ -77,6 +80,7 @@ ApplicationWindow {
                 Text {
                     text: name + ": " + dist
                     anchors.verticalCenter: parent.verticalCenter
+                    width: parent.fill
                 }
                 spacing: 10
             }
