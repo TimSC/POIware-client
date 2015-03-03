@@ -72,7 +72,8 @@ Item {
     RowLayout {
         id: bottomRowLayout
         y: 359
-        height: 30
+        height: 60
+        scale: 1
         anchors.right: parent.right
         anchors.rightMargin: 0
         anchors.left: parent.left
@@ -83,6 +84,7 @@ Item {
         Button {
             id: viewButton
             text: qsTr("View")
+            scale: 1
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 5
             anchors.top: parent.top
@@ -94,7 +96,8 @@ Item {
 
     RowLayout {
         id: topRowLayout
-        height: 30
+        height: 60
+        scale: 1
         anchors.right: parent.right
         anchors.rightMargin: 0
         anchors.left: parent.left
@@ -105,6 +108,7 @@ Item {
         Button {
             id: refreshButton
             text: qsTr("Refresh")
+            scale: 1
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 5
             anchors.top: parent.top
