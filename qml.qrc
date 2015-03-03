@@ -5,5 +5,6 @@
         <file>test.gpx</file>
         <file>PoiView.qml</file>
         <file>PoiViewForm.ui.qml</file>
+        <file>MagCompass.qml</file>
     </qresource>
 </RCC>

@@ -13,13 +13,14 @@ Item {
     property alias distLabel: distLabel
     property alias textDist: textDist
     property alias textBearing: textBearing
+    property alias textHeading: textHeading
 
     ColumnLayout {
         id: columnLayout1
         anchors.fill: parent
 
-        Flickable {
-            id: flickable1
+Flickable {
+    id: flickable1
             clip: true
             flickableDirection: Flickable.VerticalFlick
             anchors.fill: parent
@@ -96,7 +97,20 @@ Item {
                 anchors.topMargin: 5
                 font.pixelSize: 12
             }
+
+            TextEdit {
+                id: textHeading
+                width: 80
+                height: 20
+                text: qsTr("Text Edit")
+                anchors.left: parent.left
+                anchors.leftMargin: 0
+                anchors.top: textBearing.bottom
+                anchors.topMargin: 5
+                font.pixelSize: 12
+            }
         }
+
     }
 }
 

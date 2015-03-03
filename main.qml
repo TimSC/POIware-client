@@ -25,6 +25,18 @@ ApplicationWindow {
         }
     }
 
+    /*function magCompassChanged(bearingDeg) {
+        console.log("Bearing changed: " + bearingDeg);
+    }*/
+
+    MagCompass
+    {
+        id: compass
+        onMagChange: {
+            poiView.setHeading(bearing)
+        }
+    }
+
     PositionSource {
         id: positionSource
         active: true
@@ -191,6 +203,11 @@ ApplicationWindow {
                 poiView.visible = false
                 nearbyForm.visible = true
             }
+        }
+
+        function setHeading(bearing) {
+            textHeading.text = bearing
+            //console.log("Bearing changed: " + bearing);
         }
 
         function toRadians(deg) {

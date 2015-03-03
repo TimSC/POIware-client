@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick widgets positioning
+QT += qml quick widgets positioning sensors
 
 SOURCES += main.cpp
 
