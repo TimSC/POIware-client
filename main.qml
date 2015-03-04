@@ -4,6 +4,7 @@ import QtQuick.Window 2.2
 import QtQuick.Dialogs 1.2
 import QtQuick.XmlListModel 2.0
 import QtPositioning 5.2
+import QtQuick.LocalStorage 2.0
 
 ApplicationWindow {
     title: qsTr("Hello World")
@@ -44,7 +45,7 @@ ApplicationWindow {
 
         onPositionChanged: {
             var pos = positionSource.position
-            console.log("Position changed: " + pos.coordinate);
+            console.log("Position changed: " + pos.coordinate)
             poiView.updatePosition(pos)
         }
     }
@@ -77,10 +78,8 @@ ApplicationWindow {
         nearbyList.highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
         nearbyList.highlightFollowsCurrentItem: true
 
-        function viewPoi() {
-            var index = nearbyList.currentIndex
-            console.log("view poi:" + index);
-
+        function viewPoi(poiid) {
+            poiView.poiid = poiid
             poiView.visible = true
             nearbyForm.visible = false
         }
@@ -118,29 +117,52 @@ ApplicationWindow {
 
                 onDoubleClicked: {
                     container.ListView.view.currentIndex = index
-                    nearbyForm.viewPoi()
+                    var item = nearbyModel.get(index)
+                    nearbyForm.viewPoi(item.rowid)
                 }
             }
         }
 
         function toRadians(deg) {
-            return deg * Math.PI / 180.;
+            return deg * Math.PI / 180.
         }
 
         function toDegrees(rad) {
-            return rad * 180. / Math.PI;
+            return rad * 180. / Math.PI
         }
 
         viewButton.onClicked:
         {
-            viewPoi()
+            var item = nearbyModel.get(nearbyList.currentIndex)
+            viewPoi(item.rowid)
+        }
+
+        syncButton.onClicked:
+        {
+            var db = LocalStorage.openDatabaseSync("QQmlExampleDB", "1.0", "The Example QML SQL!", 1000000)
+
+            db.transaction(
+                function(tx) {
+                    //tx.executeSql('DROP TABLE pois;')
+
+                    // Create the database if it doesn't already exist
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS pois(rowid INTEGER PRIMARY KEY, name TEXT, lat REAL, lon REAL)')
+
+                    tx.executeSql('DELETE FROM pois;')
+
+                    for(var i=0;i< gpxSource.count; i++)
+                    {
+                        var item = gpxSource.get(i)
+                        tx.executeSql('INSERT INTO pois (name, lat, lon) VALUES(?, ?, ?);', [ item.name, item.lat, item.lon ])
+                    }
+                }
+            )
         }
 
         refreshButton.onClicked:
         {
-            var currentLat = 51.2365
-            var currentLon = -0.5703
-            var pos = positionSource.position.coordinate
+            var currentLat = 52.
+            var currentLon = -1.15
 
             if(positionSource.position.latitudeValid)
                 currentLat = positionSource.position.coordinate.latitude
@@ -149,17 +171,26 @@ ApplicationWindow {
                 currentLon = positionSource.position.coordinate.longitude
 
             //Calculate distance to each poi
+            var db = LocalStorage.openDatabaseSync("QQmlExampleDB", "1.0", "The Example QML SQL!", 1000000)
             var poiList = []
-            for(var i=0;i< gpxSource.count; i++)
-            {
-                var item = gpxSource.get(i)
 
-                //Based on http://www.movable-type.co.uk/scripts/latlong.html
-                var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
-                var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
+            db.transaction(
+                function(tx) {
+                var rs = tx.executeSql('SELECT * FROM pois;');
 
-                poiList.push({"name":item.name, "colorCode": "green", "dist": d})
+                console.log("current: " + currentLat + "," + currentLon)
+
+                for(var i = 0; i < rs.rows.length; i++) {
+                    var item = rs.rows.item(i)
+
+                    //Based on http://www.movable-type.co.uk/scripts/latlong.html
+                    var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
+                    var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
+
+                    poiList.push({"name":item.name, "colorCode": "green", "dist": d, "rowid": item.rowid})
+                }
             }
+            )
 
             //Sort pois by distance
             poiList.sort(function(a, b){return a["dist"]-b["dist"]})
@@ -170,7 +201,7 @@ ApplicationWindow {
             {
                 var item = poiList[i]
                 //console.log("item" + item)
-                nearbyModel.append({"name":item["name"], "colorCode": item["colorCode"], "dist": item["dist"]})
+                nearbyModel.append({"name":item["name"], "colorCode": item["colorCode"], "dist": item["dist"], "rowid": item.rowid})
             }
         }
 
@@ -190,71 +221,5 @@ ApplicationWindow {
         id: poiView
         visible: false
         anchors.fill: parent
-        focus: true
-
-        backButton.onClicked: {
-            poiView.visible = false
-            nearbyForm.visible = true
-        }
-
-        Keys.onReleased: {
-            if (event.key == Qt.Key_Back && visible) {
-                event.accepted = true
-                poiView.visible = false
-                nearbyForm.visible = true
-            }
-        }
-
-        function setHeading(bearing) {
-            textHeading.text = bearing
-            //console.log("Bearing changed: " + bearing);
-        }
-
-        function toRadians(deg) {
-            return deg * Math.PI / 180.;
-        }
-
-        function toDegrees(rad) {
-            return rad * 180. / Math.PI;
-        }
-
-        function relativeBearing(b1, b2)
-        {
-            b1y = Math.cos(b1);
-            b1x = Math.sin(b1);
-            b2y = Math.cos(b2);
-            b2x = Math.sin(b2);
-            crossp = b1y * b2x - b2y * b1x;
-            dotp = b1x * b2x + b1y * b2y;
-            if(crossp > 0.)
-                return Math.acos(dotp);
-            return -Math.acos(dotp);
-        }
-
-        function updatePosition(pos)
-        {
-            var currentLat = 52.
-            if(pos.latitudeValid)
-                currentLat = pos.coordinate.latitude
-
-            var currentLon = -1.15
-            if(pos.longitudeValid)
-                currentLon = pos.coordinate.longitude
-
-            var dstlat = 51.0
-            var dstlon = -1.0
-
-            //Based on http://www.movable-type.co.uk/scripts/latlong.html
-            var φ1 = toRadians(dstlat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-dstlon), R = 6371000. // gives d in metres
-            var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R
-            textDist.text = d
-
-            var φ1 = toRadians(currentLat), φ2 = toRadians(dstlat), λ2 = toRadians(dstlon), λ1 = toRadians(currentLon), R = 6371000.
-            var y = Math.sin(λ2-λ1) * Math.cos(φ2)
-            var x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1)
-            var dstbrng = toDegrees(Math.atan2(y, x))
-            textBearing.text = dstbrng
-
-        }
     }
 }

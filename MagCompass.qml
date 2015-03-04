@@ -14,7 +14,9 @@ Item {
         running: true
         repeat: true
         onTriggered: {
-            demoHeading += 5
+            demoHeading += 5.
+            if (demoHeading >= 360.)
+                demoHeading -= 360.
             if (realCompass != 1)
                 baseCompass.magChange(demoHeading)
         }

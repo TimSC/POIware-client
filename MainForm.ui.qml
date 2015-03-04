@@ -10,6 +10,7 @@ Item {
     property alias refreshButton: refreshButton
     property alias nearbyList: nearbyList
     property alias viewButton: viewButton
+    property alias syncButton: syncButton
 
     ColumnLayout {
         id: columnLayout1
@@ -107,14 +108,25 @@ Item {
 
         Button {
             id: refreshButton
-            text: qsTr("Refresh")
+            text: qsTr("List")
             scale: 1
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 5
             anchors.top: parent.top
             anchors.topMargin: 5
+            anchors.left: syncButton.right
+            anchors.leftMargin: 5
+        }
+
+        Button {
+            id: syncButton
+            text: qsTr("Sync")
             anchors.left: parent.left
             anchors.leftMargin: 5
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
         }
     }
 }
