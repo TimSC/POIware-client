@@ -26,10 +26,6 @@ ApplicationWindow {
         }
     }
 
-    /*function magCompassChanged(bearingDeg) {
-        console.log("Bearing changed: " + bearingDeg);
-    }*/
-
     MagCompass
     {
         id: compass
@@ -53,7 +49,7 @@ ApplicationWindow {
     XmlListModel
     {
         id: gpxSource
-        source: "test.gpx"
+        source: "http://gis.kinatomic.com/POIware/api"
         query: "/gpx/wpt"
         namespaceDeclarations: "declare namespace xsd='http://www.w3.org/2001/XMLSchema'; declare namespace xsi='http://www.w3.org/2001/XMLSchema-instance'; declare default element namespace 'http://www.topografix.com/GPX/1/0';"
 
@@ -150,6 +146,9 @@ ApplicationWindow {
 
                     tx.executeSql('DELETE FROM pois;')
 
+                    //console.log("test: " + gpxSource.count)
+                    //console.log("status: " + (gpxSource.status == XmlListModel.Error))
+                    //console.log("error: " + gpxSource.errorString())
                     for(var i=0;i< gpxSource.count; i++)
                     {
                         var item = gpxSource.get(i)

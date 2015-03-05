@@ -22,7 +22,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: 5
         anchors.bottom: bottomRowLayout.top
-        anchors.bottomMargin: -95
+        anchors.bottomMargin: 5
         anchors.left: parent.left
         anchors.leftMargin: 5
         anchors.top: topRowLayout.bottom
