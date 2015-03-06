@@ -46,37 +46,6 @@ ApplicationWindow {
         }
     }
 
-    XmlListModel
-    {
-        id: gpxSource
-        source: "http://gis.kinatomic.com/POIware/api"
-        query: "/gpx/wpt"
-        namespaceDeclarations: "declare namespace xsd='http://www.w3.org/2001/XMLSchema'; declare namespace xsi='http://www.w3.org/2001/XMLSchema-instance'; declare default element namespace 'http://www.topografix.com/GPX/1/0';"
-
-        property real currentLat: 52.
-        property real currentLon: -1.15
-
-        function updateSource(){
-            source = "http://gis.kinatomic.com/POIware/api?lat="+currentLat+"&lon="+currentLon
-        }
-
-        onCurrentLatChanged: {
-            updateSource()
-        }
-        onCurrentLonChanged: {
-            updateSource()
-        }
-
-        XmlRole { name: "lon"; query: "@lon/number()"}
-        XmlRole { name: "lat"; query: "@lat/number()"}
-        XmlRole { name: "name"; query: "name/string()" }
-        XmlRole { name: "urlname"; query: "urlname/string()" }
-        XmlRole { name: "url"; query: "url/string()"}
-        XmlRole { name: "ele"; query: "ele/number()" }
-        XmlRole { name: "version"; query: "extensions/poiware/version/number()" }
-        XmlRole { name: "poiid"; query: "extensions/poiware/poiid/number()" }
-    }
-
     ListModel
     {
         id: nearbyModel
@@ -90,30 +59,59 @@ ApplicationWindow {
         nearbyList.highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
         nearbyList.highlightFollowsCurrentItem: true
 
-        property int queryInProgress: 1
+        property int queryInProgress: 0
         property real currentLat: 52.
         property real currentLon: -1.15
 
-        Timer {
-            //Timer to check when xml data is ready
-            interval: 200
-            running: true
-            repeat: true
-            onTriggered: {
-
-                if(parent.queryInProgress && gpxSource.status == XmlListModel.Ready)
+        Item {
+            id: httpQuery
+            function receivedResult(http) { // Call a function when the state changes.
+                if (http.status == 200 || http.status == 0)
                 {
-                    console.log("query result ready")
-                    parent.processReceivedQueryResult()
-                    parent.queryInProgress = 0
+                    var actualXml = http.responseXML.documentElement;
+                    if(actualXml==null)
+                    {
+                        console.log("responseXml is null")
+                    }
+                    else
+                        parent.processReceivedQueryResult(actualXml)
                 }
-
-                if(parent.queryInProgress && gpxSource.status == XmlListModel.Error)
+                else
                 {
-                    console.log("query result error")
-                    console.log("error: " + gpxSource.errorString())
-                    parent.queryInProgress = 0
+                    console.log("HTTP status:"+http.status+ " "+http.statusText)
                 }
+            }
+
+            function showRequestInfo(text) {
+                //log.text = log.text + "\n" + text
+                //console.log(text)
+            }
+
+            function go()
+            {
+                var http = new XMLHttpRequest()
+                var url = "http://gis.kinatomic.com/POIware/api"
+                var params = "lat="+parent.currentLat+"&lon="+parent.currentLon
+                var method = "POST"
+                http.open(method, url, true);
+
+                // Send the proper header information along with the request
+                http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                http.setRequestHeader("Content-length", params.length);
+                http.setRequestHeader("Connection", "close");
+
+                http.onreadystatechange = function() { // Call a function when the state changes.
+                    if (http.readyState == XMLHttpRequest.DONE) {
+                        receivedResult(http)
+                    }
+                    else
+                        console.log("HTTP request status: "+http.readyState)
+                }
+                if(method == "POST")
+                    http.send(params)
+                else
+                    http.send()
+
             }
         }
 
@@ -243,42 +241,96 @@ ApplicationWindow {
             )*/
         }
 
-        function processReceivedQueryResult()
+        function getTextFromNode(xmlNode)
+        {
+            var out = ""
+            for (var ii = 0; ii < xmlNode.childNodes.length; ++ii) {
+                var cn = xmlNode.childNodes[ii]
+                if(cn.nodeType != 3) continue
+                out += cn.nodeValue
+            }
+            return out
+        }
+
+        function processReceivedQueryResult(resultXml)
         {
             var poiList = []
 
-            if(gpxSource.status == XmlListModel.Ready)
-            {
-                for(var i = 0; i < gpxSource.count; i++) {
-                    var item = gpxSource.get(i)
+            //Parse GPX
+            for (var ii = 0; ii < resultXml.childNodes.length; ++ii) {
+                var node = resultXml.childNodes[ii]
+                if(node.nodeType != 1) continue
+                if(node.nodeName != "wpt") continue
+                var wpt = {}
 
-                    //console.log("poiid: " + item.poiid)
-
-                    //Based on http://www.movable-type.co.uk/scripts/latlong.html
-                    var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
-                    var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
-
-                    poiList.push({"name":item.name, "colorCode": "green", "dist": d, "poiid": item.poiid})
+                for (var iii = 0; iii < node.attributes.length; ++iii) {
+                    if(node.attributes[iii].name=="lat") wpt["lat"] = parseFloat(node.attributes[iii].value)
+                    if(node.attributes[iii].name=="lon") wpt["lon"] = parseFloat(node.attributes[iii].value)
                 }
+
+                for (var iii = 0; iii < node.childNodes.length; ++iii) {
+                    var node2 = node.childNodes[iii]
+                    if(node2.nodeType != 1) continue
+                    //console.log(node2.nodeName)
+                    if(node2.nodeName == "name")
+                        wpt["name"] = getTextFromNode(node2)
+
+                    if(node2.nodeName == "extensions")
+                    {
+                        for (var i4 = 0; i4 < node2.childNodes.length; ++i4) {
+                            var node3 = node2.childNodes[i4]
+                            if(node3.nodeType != 1) continue
+                            if(node3.nodeName != "poiware") continue
+
+                            for (var i5 = 0; i5 < node3.childNodes.length; ++i5) {
+                                var node4 = node3.childNodes[i5]
+                                if(node4.nodeType != 1) continue
+                                wpt[node4.nodeName] = getTextFromNode(node4)
+                            }
+                        }
+                    }
+                }
+
+                //{"name":item.name, "colorCode": "green", "dist": d, "poiid": item.poiid}
+                poiList.push(wpt)
+
             }
 
-            //Sort pois by distance
-            poiList.sort(function(a, b){return a["dist"]-b["dist"]})
+            //Calculate distance to POIs
+            var poiDistList = []
+            console.log(poiList.length)
+
+            for(var i = 0; i < poiList.length; i++) {
+                var item = poiList[i]
+
+                console.log("poiid: " + item.poiid + "," + item.lat + "," + item.lon)
+
+                //Based on http://www.movable-type.co.uk/scripts/latlong.html
+                var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
+                var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
+
+                poiDistList.push({"name":item.name, "dist": d, "poiid": item.poiid})
+            }
+            console.log(poiDistList.length)
+
+            //Sort POIs by distance
+            poiDistList.sort(function(a, b){return a["dist"]-b["dist"]})
 
             //Update the UI model
             nearbyModel.clear()
-            for(var i=0;i< poiList.length; i++)
+            for(var i=0;i< poiDistList.length; i++)
             {
-                var item = poiList[i]
+                var item = poiDistList[i]
                 //console.log("item" + item)
-                nearbyModel.append({"name":item["name"], "colorCode": item["colorCode"], "dist": item["dist"], "poiid": item.poiid})
+                nearbyModel.append({"name":item["name"], "colorCode": "green", "dist": item["dist"], "poiid": item.poiid})
             }
 
         }
 
         refreshButton.onClicked:
         {
-            populateList()
+            httpQuery.go()
+            //populateList()
         }
 
     }
