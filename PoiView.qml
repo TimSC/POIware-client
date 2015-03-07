@@ -60,9 +60,42 @@ PoiViewForm {
         }
     }
 
-    function processReceivedPoiResult(actualXml)
+    function getTextFromNode(xmlNode)
     {
-        console.log("TODO")
+        var out = ""
+        for (var ii = 0; ii < xmlNode.childNodes.length; ++ii) {
+            var cn = xmlNode.childNodes[ii]
+            if(cn.nodeType != 3) continue
+            out += cn.nodeValue
+        }
+        return out
+    }
+
+    function processReceivedPoiResult(resultXml)
+    {
+
+
+        //Parse POI details
+        for (var ii = 0; ii < resultXml.childNodes.length; ++ii) {
+            var node = resultXml.childNodes[ii]
+            if(node.nodeType != 1) continue
+            console.log(node.nodeName)
+            var nodeText = getTextFromNode(node)
+
+            if(node.nodeName == "name")
+                poiTitle.text = nodeText
+            if(node.nodeName == "lat")
+                dstlat = parseFloat(nodeText)
+            if(node.nodeName == "lon")
+                dstlon = parseFloat(nodeText)
+            /*if(node.nodeName == "data")
+                dstlon = parseFloat(nodeText)
+            if(node.nodeName == "dataset")
+                dstlon = parseFloat(nodeText)*/
+
+        }
+
+        refreshCalc()
 
     }
 
@@ -107,7 +140,7 @@ PoiViewForm {
             }
         )*/
 
-        refreshCalc()
+
     }
 
     function setHeading(bearing) {
