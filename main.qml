@@ -91,7 +91,7 @@ ApplicationWindow {
             {
                 var http = new XMLHttpRequest()
                 var url = "http://gis.kinatomic.com/POIware/api"
-                var params = "lat="+parent.currentLat+"&lon="+parent.currentLon
+                var params = "lat="+parent.currentLat+"&lon="+parent.currentLon+"&action=query"
                 var method = "POST"
                 http.open(method, url, true);
 

@@ -10,6 +10,62 @@ PoiViewForm {
 
     focus: true
 
+    Item {
+        id: httpQuery
+        function receivedResult(http) { // Call a function when the state changes.
+            if (http.status == 200 || http.status == 0)
+            {
+                var actualXml = http.responseXML.documentElement;
+                if(actualXml==null)
+                {
+                    console.log("responseXml is null")
+                }
+                else
+                {
+                    //console.log(http.responseText)
+                    parent.processReceivedPoiResult(actualXml)
+                }
+            }
+            else
+            {
+                console.log("HTTP status:"+http.status+ " "+http.statusText)
+            }
+        }
+
+        function go()
+        {
+            var http = new XMLHttpRequest()
+            var url = "http://gis.kinatomic.com/POIware/api"
+            var params = "poiid="+parent.poiid+"&action=get"
+            var method = "POST"
+            http.open(method, url, true);
+
+            // Send the proper header information along with the request
+            http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            http.setRequestHeader("Content-length", params.length);
+            http.setRequestHeader("Connection", "close");
+
+            http.onreadystatechange = function() { // Call a function when the state changes.
+                if (http.readyState == XMLHttpRequest.DONE) {
+                    receivedResult(http)
+                }
+                else
+                    console.log("HTTP request status: "+http.readyState)
+            }
+            if(method == "POST")
+                http.send(params)
+            else
+                http.send()
+
+        }
+    }
+
+    function processReceivedPoiResult(actualXml)
+    {
+        console.log("TODO")
+
+    }
+
     backButton.onClicked: {
         poiView.visible = false
         nearbyForm.visible = true
@@ -32,7 +88,10 @@ PoiViewForm {
     {
         console.log("view poi: " + poiid)
 
-        var db = LocalStorage.openDatabaseSync("QQmlExampleDB", "1.0", "The Example QML SQL!", 1000000)
+        httpQuery.go()
+
+
+        /*var db = LocalStorage.openDatabaseSync("QQmlExampleDB", "1.0", "The Example QML SQL!", 1000000)
 
         db.transaction(
             function(tx) {
@@ -46,7 +105,7 @@ PoiViewForm {
                     dstlon = item.lon
                 }
             }
-        )
+        )*/
 
         refreshCalc()
     }
