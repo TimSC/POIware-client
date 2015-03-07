@@ -10,6 +10,11 @@ PoiViewForm {
 
     focus: true
 
+    PoiDatabase {
+        id: poiDatabase
+
+    }
+
     Item {
         id: httpQuery
         function receivedResult(http) { // Call a function when the state changes.
@@ -73,27 +78,33 @@ PoiViewForm {
 
     function processReceivedPoiResult(resultXml)
     {
-
+        var poi = {}
 
         //Parse POI details
         for (var ii = 0; ii < resultXml.childNodes.length; ++ii) {
             var node = resultXml.childNodes[ii]
             if(node.nodeType != 1) continue
-            console.log(node.nodeName)
+
             var nodeText = getTextFromNode(node)
 
             if(node.nodeName == "name")
-                poiTitle.text = nodeText
+                poi["name"] = nodeText
             if(node.nodeName == "lat")
-                dstlat = parseFloat(nodeText)
+                poi["lat"] = parseFloat(nodeText)
             if(node.nodeName == "lon")
-                dstlon = parseFloat(nodeText)
+                poi["lon"] = parseFloat(nodeText)
             /*if(node.nodeName == "data")
                 dstlon = parseFloat(nodeText)
             if(node.nodeName == "dataset")
                 dstlon = parseFloat(nodeText)*/
 
         }
+
+        poiTitle.text = poi["name"]
+        dstlat = poi["lat"]
+        dstlon = poi["lon"]
+
+        poiDatabase.cachePoi(poi)
 
         refreshCalc()
 

@@ -6,5 +6,6 @@
         <file>PoiView.qml</file>
         <file>PoiViewForm.ui.qml</file>
         <file>MagCompass.qml</file>
+        <file>PoiDatabase.qml</file>
     </qresource>
 </RCC>
