@@ -20,16 +20,13 @@ PoiViewForm {
         function receivedResult(http) { // Call a function when the state changes.
             if (http.status == 200 || http.status == 0)
             {
-                var actualXml = http.responseXML.documentElement;
-                if(actualXml==null)
+                if(http.responseXML != null)
                 {
-                    console.log("responseXml is null")
-                }
-                else
-                {
-                    //console.log(http.responseText)
+                    var actualXml = http.responseXML.documentElement;
                     parent.processReceivedPoiResult(actualXml)
                 }
+                else
+                    parent.processReceivedPoiResult(null)
             }
             else
             {
@@ -80,31 +77,47 @@ PoiViewForm {
     {
         var poi = {}
 
-        //Parse POI details
-        for (var ii = 0; ii < resultXml.childNodes.length; ++ii) {
-            var node = resultXml.childNodes[ii]
-            if(node.nodeType != 1) continue
+        if(resultXml!= null)
+        {
+            //Parse POI details
+            for (var i = 0; i < resultXml.attributes.length; ++i) {
+                if(resultXml.attributes[i].name=="poiid") poi["poiid"] = parseInt(resultXml.attributes[i].value)
+                if(resultXml.attributes[i].name=="version") poi["version"] = parseInt(resultXml.attributes[i].value)
+            }
 
-            var nodeText = getTextFromNode(node)
+            for (var ii = 0; ii < resultXml.childNodes.length; ++ii) {
+                var node = resultXml.childNodes[ii]
+                if(node.nodeType != 1) continue
 
-            if(node.nodeName == "name")
-                poi["name"] = nodeText
-            if(node.nodeName == "lat")
-                poi["lat"] = parseFloat(nodeText)
-            if(node.nodeName == "lon")
-                poi["lon"] = parseFloat(nodeText)
-            /*if(node.nodeName == "data")
-                dstlon = parseFloat(nodeText)
-            if(node.nodeName == "dataset")
-                dstlon = parseFloat(nodeText)*/
+                var nodeText = getTextFromNode(node)
 
+                if(node.nodeName == "name")
+                    poi["name"] = nodeText
+                if(node.nodeName == "lat")
+                    poi["lat"] = parseFloat(nodeText)
+                if(node.nodeName == "lon")
+                    poi["lon"] = parseFloat(nodeText)
+                /*if(node.nodeName == "data")
+                    dstlon = parseFloat(nodeText)
+                if(node.nodeName == "dataset")
+                    dstlon = parseFloat(nodeText)*/
+
+            }
+
+            poiTitle.text = poi["name"]
+            dstlat = poi["lat"]
+            dstlon = poi["lon"]
+
+            poiDatabase.cachePois([poi])
         }
-
-        poiTitle.text = poi["name"]
-        dstlat = poi["lat"]
-        dstlon = poi["lon"]
-
-        poiDatabase.cachePoi(poi)
+        else
+        {
+            //Try cached POI
+            var poiDetail = poiDatabase.getPoi(poiid)
+            poiTitle.text = poiDetail["name"]
+            dstlat = poiDetail["lat"]
+            dstlon = poiDetail["lon"]
+        }
 
         refreshCalc()
 

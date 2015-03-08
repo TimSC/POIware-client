@@ -69,25 +69,21 @@ ApplicationWindow {
         Item {
             id: httpQuery
             function receivedResult(http) { // Call a function when the state changes.
+
                 if (http.status == 200 || http.status == 0)
                 {
-                    var actualXml = http.responseXML.documentElement;
-                    if(actualXml==null)
+                    if(http.responseXML != null)
                     {
-                        console.log("responseXml is null")
+                        var actualXml = http.responseXML.documentElement;
+                        parent.processReceivedQueryResult(actualXml)
                     }
                     else
-                        parent.processReceivedQueryResult(actualXml)
+                        parent.processReceivedQueryResult(null)
                 }
                 else
                 {
                     console.log("HTTP status:"+http.status+ " "+http.statusText)
                 }
-            }
-
-            function showRequestInfo(text) {
-                //log.text = log.text + "\n" + text
-                //console.log(text)
             }
 
             function go()
@@ -206,7 +202,7 @@ ApplicationWindow {
             return out
         }
 
-        function processReceivedQueryResult(resultXml)
+        function parseGpx(resultXml)
         {
             var poiList = []
 
@@ -250,6 +246,19 @@ ApplicationWindow {
 
             }
 
+            return poiList
+
+        }
+
+        function processReceivedQueryResult(resultXml)
+        {
+            var poiList = []
+            if(resultXml != null)
+                poiList = parseGpx(resultXml)
+
+            if(poiList.length == 0)
+               poiList = poiDatabase.queryPois()
+
             //Calculate distance to POIs
             var poiDistList = []
             console.log(poiList.length)
@@ -265,7 +274,7 @@ ApplicationWindow {
 
                 poiDistList.push({"name":item.name, "dist": d, "poiid": item.poiid})
             }
-            console.log(poiDistList.length)
+            //console.log(poiDistList.length)
 
             //Sort POIs by distance
             poiDistList.sort(function(a, b){return a["dist"]-b["dist"]})
@@ -275,8 +284,17 @@ ApplicationWindow {
             for(var i=0;i< poiDistList.length; i++)
             {
                 var item = poiDistList[i]
+
+                //Check if this POI has been cached
+                console.log(item.poiid)
+                var poiDetail = poiDatabase.getPoi(item.poiid)
+
+                var colour = "green"
+                if(poiDetail != null)
+                    colour = "red"
+
                 //console.log("item" + item)
-                nearbyModel.append({"name":item["name"], "colorCode": "green", "dist": item["dist"], "poiid": item.poiid})
+                nearbyModel.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item.poiid})
             }
 
         }
