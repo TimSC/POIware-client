@@ -60,6 +60,10 @@ ApplicationWindow {
 
         property real currentLat: 52.
         property real currentLon: -1.15
+        anchors.rightMargin: 0
+        anchors.bottomMargin: 0
+        anchors.leftMargin: 0
+        anchors.topMargin: 0
 
         PoiDatabase {
             id: poiDatabase
@@ -115,9 +119,25 @@ ApplicationWindow {
         }
 
         function viewPoi(poiid) {
+
             poiView.poiid = poiid
             poiView.visible = true
             nearbyForm.visible = false
+            slippyMap.visible = false
+        }
+
+        viewMapButton.onClicked:
+        {
+            if(positionSource.position.latitudeValid)
+                currentLat = positionSource.position.coordinate.latitude
+
+            if(positionSource.position.longitudeValid)
+                currentLon = positionSource.position.coordinate.longitude
+
+            httpQuery.go()
+
+            slippyMap.visible = true
+            nearbyList.visible = false
         }
 
         nearbyList.delegate: Item
@@ -176,6 +196,12 @@ ApplicationWindow {
         syncButton.onClicked:
         {
 
+        }
+
+        SlippyMap{
+            id: slippyMap
+            visible: false
+            anchors.fill: parent.centralArea
         }
 
         function getTextFromNode(xmlNode)
@@ -293,6 +319,9 @@ ApplicationWindow {
 
             if(positionSource.position.longitudeValid)
                 currentLon = positionSource.position.coordinate.longitude
+
+            slippyMap.visible = false
+            nearbyList.visible = true
 
             httpQuery.go()
             //populateList()

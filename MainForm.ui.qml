@@ -11,63 +11,12 @@ Item {
     property alias nearbyList: nearbyList
     property alias viewButton: viewButton
     property alias syncButton: syncButton
+    property alias viewMapButton: viewMapButton
+    property alias centralArea: centralArea
 
     ColumnLayout {
         id: columnLayout1
         anchors.fill: parent
-    }
-
-    ListView {
-        id: nearbyList
-        anchors.right: parent.right
-        anchors.rightMargin: 5
-        anchors.bottom: bottomRowLayout.top
-        anchors.bottomMargin: 5
-        anchors.left: parent.left
-        anchors.leftMargin: 5
-        anchors.top: topRowLayout.bottom
-        anchors.topMargin: 5
-        model: ListModel {
-            ListElement {
-                name: "Grey"
-                colorCode: "grey"
-            }
-
-            ListElement {
-                name: "Red"
-                colorCode: "red"
-            }
-
-            ListElement {
-                name: "Blue"
-                colorCode: "blue"
-            }
-
-            ListElement {
-                name: "Green"
-                colorCode: "green"
-            }
-        }
-        delegate: Item {
-            x: 5
-            width: 80
-            height: 40
-            Row {
-                id: row1
-                Rectangle {
-                    width: 40
-                    height: 40
-                    color: colorCode
-                }
-
-                Text {
-                    text: name
-                    font.bold: true
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                spacing: 10
-            }
-        }
     }
 
     RowLayout {
@@ -128,5 +77,75 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 5
         }
+
+        Button {
+            id: viewMapButton
+            text: qsTr("Map")
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.left: refreshButton.right
+            anchors.leftMargin: 5
+        }
+    }
+
+    Rectangle {
+        id: centralArea
+        color: "#00000000"
+        anchors.right: parent.right
+        anchors.rightMargin: 0
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        anchors.top: topRowLayout.bottom
+        anchors.topMargin: 5
+        anchors.bottom: bottomRowLayout.top
+        anchors.bottomMargin: 5
+
+        ListView {
+            id: nearbyList
+            anchors.fill: parent
+            model: ListModel {
+                ListElement {
+                    name: "Grey"
+                    colorCode: "grey"
+                }
+
+                ListElement {
+                    name: "Red"
+                    colorCode: "red"
+                }
+
+                ListElement {
+                    name: "Blue"
+                    colorCode: "blue"
+                }
+
+                ListElement {
+                    name: "Green"
+                    colorCode: "green"
+                }
+            }
+            delegate: Item {
+                x: 5
+                width: 80
+                height: 40
+                Row {
+                    id: row1
+                    Rectangle {
+                        width: 40
+                        height: 40
+                        color: colorCode
+                    }
+
+                    Text {
+                        text: name
+                        font.bold: true
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    spacing: 10
+                }
+            }
+    }
     }
 }

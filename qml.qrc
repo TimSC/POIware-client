@@ -7,5 +7,6 @@
         <file>PoiViewForm.ui.qml</file>
         <file>MagCompass.qml</file>
         <file>PoiDatabase.qml</file>
+        <file>SlippyMap.qml</file>
     </qresource>
 </RCC>
