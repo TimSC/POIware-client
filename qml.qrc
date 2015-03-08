@@ -8,5 +8,6 @@
         <file>MagCompass.qml</file>
         <file>PoiDatabase.qml</file>
         <file>SlippyMap.qml</file>
+        <file>SlippyTile.qml</file>
     </qresource>
 </RCC>
