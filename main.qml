@@ -178,19 +178,6 @@ ApplicationWindow {
 
         }
 
-        function populateList()
-        {
-            if(positionSource.position.latitudeValid)
-                currentLat = positionSource.position.coordinate.latitude
-
-            if(positionSource.position.longitudeValid)
-                currentLon = positionSource.position.coordinate.longitude
-
-            gpxSource.currentLat = currentLat
-            gpxSource.currentLon = currentLon
-            gpxSource.reload()
-        }
-
         function getTextFromNode(xmlNode)
         {
             var out = ""
@@ -301,6 +288,12 @@ ApplicationWindow {
 
         refreshButton.onClicked:
         {
+            if(positionSource.position.latitudeValid)
+                currentLat = positionSource.position.coordinate.latitude
+
+            if(positionSource.position.longitudeValid)
+                currentLon = positionSource.position.coordinate.longitude
+
             httpQuery.go()
             //populateList()
         }
