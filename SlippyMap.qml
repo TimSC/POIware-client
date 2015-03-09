@@ -236,7 +236,7 @@ Rectangle {
                 {
                     var tile2 = xrow[y]
 
-                    console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
+                    //console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
                     if(tile2 != null)
                         tile2.destroy()
                     delete xrow[y]
@@ -261,7 +261,7 @@ Rectangle {
                 //console.log(x+","+y)
                 var tile2 = xrow[y]
 
-                console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
+                //console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
                 if(tile2 != null)
                     tile2.destroy()
                 delete xrow[y]
@@ -284,7 +284,7 @@ Rectangle {
                     dest = 1
                 if(dest)
                 {
-                    console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
+                    //console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
                     if(tile2 != null)
                         tile2.destroy()
                     delete xrow[y]
@@ -340,6 +340,17 @@ Rectangle {
         repositionMarkers()
     }
 
+    onLatChanged: {
+        checkTilesLoaded()
+        repositionTiles()
+        repositionMarkers()
+    }
+
+    onLonChanged: {
+        checkTilesLoaded()
+        repositionTiles()
+        repositionMarkers()
+    }
 
     Component.onCompleted:
     {

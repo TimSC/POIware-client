@@ -1,16 +1,65 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.3
+import QtQuick.Layouts 1.1
 
 Item {
     anchors.fill: parent
+
+    property real lat: lat
+    property real lon: lon
 
     ListModel
     {
         id: nearbyModel
     }
 
+    TextArea {
+        id: latText
+        height: 50
+        width: 200
+        text: "lat"
+        anchors.top: parent.top
+        anchors.topMargin: 0
+        anchors.leftMargin: 0
+        anchors.left: parent.left
+
+        font.pointSize: 12
+        readOnly: false
+
+        onTextChanged:{
+            parent.lat = parseFloat(text)
+        }
+    }
+
+    TextArea {
+        id: lonText
+        height: 50
+        width: 200
+        text: "lon"
+        anchors.top: parent.top
+        anchors.topMargin: 0
+        anchors.leftMargin: 5
+        anchors.left: latText.right
+
+        font.pointSize: 12
+        readOnly: false
+
+        onTextChanged:{
+            parent.lon = parseFloat(text)
+        }
+    }
+
     ListView {
         id: nearbyList
-        anchors.fill: parent
+        anchors.top: latText.bottom
+        anchors.topMargin: 0
+
+        anchors.leftMargin: 0
+        anchors.left: parent.left
+        anchors.rightMargin: 0
+        anchors.right: parent.right
+        anchors.bottomMargin: 0
+        anchors.bottom: parent.bottom
 
         model: nearbyModel
         clip: true
@@ -68,6 +117,14 @@ Item {
     function getCurrentPoiid(){
         var item = nearbyModel.get(poiList.currentIndex)
         return item.poiid
+    }
+
+    onLatChanged:{
+        latText.text = lat
+    }
+
+    onLonChanged:{
+        lonText.text = lon
     }
 
 }

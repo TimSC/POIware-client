@@ -40,7 +40,7 @@ ApplicationWindow {
 
         onPositionChanged: {
             var pos = positionSource.position
-            console.log("Position changed: " + pos.coordinate)
+            //console.log("Position changed: " + pos.coordinate)
             poiView.updatePosition(pos)
         }
     }
@@ -77,15 +77,15 @@ ApplicationWindow {
                 }
                 else
                 {
-                    console.log("HTTP status:"+http.status+ " "+http.statusText)
+                    //console.log("HTTP status:"+http.status+ " "+http.statusText)
                 }
             }
 
-            function go()
+            function go(lat, lon)
             {
                 var http = new XMLHttpRequest()
                 var url = "http://gis.kinatomic.com/POIware/api"
-                var params = "lat="+parent.currentLat+"&lon="+parent.currentLon+"&action=query"
+                var params = "lat="+lat+"&lon="+lon+"&action=query"
                 var method = "POST"
                 http.open(method, url, true);
 
@@ -99,7 +99,9 @@ ApplicationWindow {
                         receivedResult(http)
                     }
                     else
-                        console.log("HTTP request status: "+http.readyState)
+                    {
+                        //console.log("HTTP request status: "+http.readyState)
+                    }
                 }
                 if(method == "POST")
                     http.send(params)
@@ -117,16 +119,18 @@ ApplicationWindow {
             slippyMap.visible = false
         }
 
+        function startQuery(lat, lon){
+            httpQuery.go(lat, lon)
+
+            /*slippyMap.lat = currentLat
+            slippyMap.lon = currentLon
+
+            poiList.lat = currentLat
+            poiList.lon = currentLon*/
+        }
+
         viewMapButton.onClicked:
         {
-            if(positionSource.position.latitudeValid)
-                currentLat = positionSource.position.coordinate.latitude
-
-            if(positionSource.position.longitudeValid)
-                currentLon = positionSource.position.coordinate.longitude
-
-            httpQuery.go()
-
             slippyMap.visible = true
             poiList.visible = false
         }
@@ -176,12 +180,12 @@ ApplicationWindow {
 
             //Calculate distance to POIs
             var poiDistList = []
-            console.log(poiListTmp.length)
+            //console.log(poiListTmp.length)
 
             for(var i = 0; i < poiListTmp.length; i++) {
                 var item = poiListTmp[i]
 
-                console.log("poiid: " + item.poiid + "," + item.lat + "," + item.lon)
+                //console.log("poiid: " + item.poiid + "," + item.lat + "," + item.lon)
 
                 //Based on http://www.movable-type.co.uk/scripts/latlong.html
                 var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
@@ -202,7 +206,7 @@ ApplicationWindow {
                 var item = poiDistList[i]
 
                 //Check if this POI has been cached
-                console.log(item.poiid)
+                //console.log(item.poiid)
                 var poiDetail = poiDatabase.getPoi(item.poiid)
 
                 var colour = "green"
@@ -224,21 +228,54 @@ ApplicationWindow {
             if(positionSource.position.longitudeValid)
                 currentLon = positionSource.position.coordinate.longitude
 
-            httpQuery.go()
+            var initLat = 51.
+            var initLon = -1.
+
+            startQuery(initLat, initLon)
+
+            slippyMap.lat = initLat
+            slippyMap.lon = initLon
+
+            poiList.lat = initLat
+            poiList.lon = initLon
         }
 
         viewListButton.onClicked:
         {
-            if(positionSource.position.latitudeValid)
+            slippyMap.visible = false
+            poiList.visible = true
+        }
+
+        searchButton.onClicked: {
+            /*if(positionSource.position.latitudeValid)
                 currentLat = positionSource.position.coordinate.latitude
 
             if(positionSource.position.longitudeValid)
-                currentLon = positionSource.position.coordinate.longitude
+                currentLon = positionSource.position.coordinate.longitude*/
 
-            slippyMap.visible = false
-            poiList.visible = true
+            var queryLat = 51.
+            var queryLon = -1.
 
-            httpQuery.go()
+            if(slippyMap.visible)
+            {
+                queryLat = slippyMap.lat
+                queryLon = slippyMap.lon
+
+                poiList.lat = slippyMap.lat
+                poiList.lon = slippyMap.lon
+            }
+
+            if(poiList.visible)
+            {
+                queryLat = poiList.lat
+                queryLon = poiList.lon
+
+                slippyMap.lat = poiList.lat
+                slippyMap.lon = poiList.lon
+            }
+
+            console.log(queryLat+","+queryLon)
+            startQuery(queryLat, queryLon)
         }
 
     }

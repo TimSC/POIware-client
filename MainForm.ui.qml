@@ -12,6 +12,7 @@ Item {
     property alias syncButton: syncButton
     property alias viewMapButton: viewMapButton
     property alias centralArea: centralArea
+    property alias searchButton: searchButton
 
     ColumnLayout {
         id: columnLayout1
@@ -86,6 +87,17 @@ Item {
             anchors.bottomMargin: 5
             anchors.left: viewListButton.right
             anchors.leftMargin: 5
+        }
+
+        Button {
+            id: searchButton
+            text: qsTr("Search")
+            anchors.left: viewMapButton.right
+            anchors.leftMargin: 5
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
         }
     }
 

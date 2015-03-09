@@ -37,7 +37,7 @@ Item {
 
     function getPoi(poiid)
     {
-        console.log("start query: "+poiid)
+        //console.log("start query: "+poiid)
 
         checkSchema()
 
