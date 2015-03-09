@@ -64,7 +64,7 @@ Rectangle {
         property var prevPos: null
 
         onPositionChanged: {
-            console.log("move " + mouse.x+","+mouse.y)
+            //console.log("move " + mouse.x+","+mouse.y)
             if(prevPos != null)
             {
                 var dx = mouse.x - prevPos[0]
@@ -75,17 +75,28 @@ Rectangle {
         }
 
         onPressed: {
-            console.log("pressed " + mouse.button)
+            //console.log("pressed " + mouse.button)
             prevPos = [mouse.x, mouse.y]
         }
 
         onReleased: {
-            console.log("released " + mouse.button)
+            //console.log("released " + mouse.button)
             prevPos = null
         }
 
         onWheel: {
-            console.log("wheel " + wheel.buttons)
+            console.log("wheel " + wheel.buttons + "," + wheel.angleDelta)
+            if(wheel.angleDelta > 0)
+            {
+                parent.zoom -= 1
+            }
+            else
+            {
+                parent.zoom += 1
+            }
+
+            checkTilesLoaded()
+            repositionTiles()
         }
 
     }
@@ -145,6 +156,7 @@ Rectangle {
 
                     tile.x = tdx * tileSize
                     tile.y = tdy * tileSize
+                    tile.visible = (z == zoom)
                 }
             }
         }
@@ -177,7 +189,7 @@ Rectangle {
                 if(!(j in tiles[zoom][i]) || tiles[zoom][i][j] == null)
                 {
                     //Based on http://qt-project.org/doc/qt-4.8/qdeclarativedynamicobjects.html
-                    var tile = component.createObject(mapArea, {"tx": i, "ty": j})
+                    var tile = component.createObject(mapArea, {"tx": i, "ty": j, "tzoom": zoom})
                     tiles[zoom][i][j] = tile
                 }
             }
