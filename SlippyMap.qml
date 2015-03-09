@@ -86,13 +86,13 @@ Rectangle {
 
         onWheel: {
             console.log("wheel " + wheel.buttons + "," + wheel.angleDelta)
-            if(wheel.angleDelta > 0)
+            if(wheel.angleDelta.y > 0)
             {
-                parent.zoom -= 1
+                parent.zoom += 1
             }
             else
             {
-                parent.zoom += 1
+                parent.zoom -= 1
             }
 
             checkTilesLoaded()
@@ -195,7 +195,53 @@ Rectangle {
             }
         }
 
-        //Unload unnecessary tiles
+        //Unload unnecessary tiles at other zoom levels
+        for(var z in tiles)
+        {
+            if(z == zoom) continue
+
+            for(var x in tiles[z])
+            {
+                var xrow = tiles[z][x]
+                for(var y in xrow)
+                {
+                    var tile2 = xrow[y]
+
+                    console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
+                    if(tile2 != null)
+                        tile2.destroy()
+                    delete xrow[y]
+                }
+            }
+
+            delete tiles[z]
+        }
+
+        //Unload unneeded tiles rows
+        for(var x in tiles[zoom])
+        {
+            var dest = 0
+            if(x < cornerx || x > corner2x)
+                dest = 1
+            if(!dest) continue
+
+            //Delete all tiles in this row
+            var xrow = tiles[zoom][x]
+            for(var y in xrow)
+            {
+                //console.log(x+","+y)
+                var tile2 = xrow[y]
+
+                console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
+                if(tile2 != null)
+                    tile2.destroy()
+                delete xrow[y]
+            }
+
+            delete tiles[zoom][x]
+        }
+
+        //Unload individual unneeded tiles
         for(var x in tiles[zoom])
         {
             //console.log(x)
@@ -209,17 +255,14 @@ Rectangle {
                     dest = 1
                 if(dest)
                 {
-                    //console.log("Unload: " + tile2.tx + "," + tile2.ty + [x, y, cornerx, cornery, corner2x, corner2y])
+                    console.log("Unload: " + tile2.tzoom +","+ tile2.tx + "," + tile2.ty)
                     if(tile2 != null)
                         tile2.destroy()
-                    xrow[y] = null
+                    delete xrow[y]
                 }
             }
 
         }
-
-        //Clean tile tree structure
-        //TODO
 
     }
 
