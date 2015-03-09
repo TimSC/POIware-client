@@ -11,7 +11,7 @@ Rectangle {
     property int zoom: 12
     property int tileSize: 256
 
-    property var tiles: []
+    property var tiles: ({})
     property var prevTouch: ({})
 
     MultiPointTouchArea {
@@ -68,6 +68,7 @@ Rectangle {
         lat = tile2lat(viewy, zoom)
         lon = tile2long(viewx, zoom)
 
+        checkTilesLoaded()
         repositionTiles()
     }
 
@@ -87,34 +88,103 @@ Rectangle {
 
         var w = width / tileSize
         var h = height / tileSize
-        console.log("Tile size: "+ w +","+ h)
-        var viewx = long2tile(lon, zoom)
-        var viewy = lat2tile(lat, zoom)
+        //console.log("Tile size: "+ w +","+ h)
 
-        console.log("view" + viewx + ","+ viewy)
-
-        //Find top left corner position
-        var cornerx = viewx - w * 0.5
-        var cornery = viewy - h * 0.5
-
-        for(var i=0; i< tiles.length;i++)
+        for(var z in tiles)
         {
-            var tile = tiles[i]
-            var tdx = (tile.tx - cornerx)
-            var tdy = (tile.ty - cornery)
-            console.log("x" + tdx)
-            console.log("y" + tdy)
-            tile.x = tdx * tileSize
-            tile.y = tdy * tileSize
+            var viewx = long2tile(lon, z)
+            var viewy = lat2tile(lat, z)
+
+            //Find top left corner position
+            var cornerx = viewx - w * 0.5
+            var cornery = viewy - h * 0.5
+
+            var xrow = tiles[z]
+            for(var x in xrow)
+            {
+                var yrow = xrow[x]
+                for(var y in yrow)
+                {
+                    var tile = yrow[y]
+                    if(tile == null) continue
+                    var tdx = (tile.tx - cornerx)
+                    var tdy = (tile.ty - cornery)
+
+                    tile.x = tdx * tileSize
+                    tile.y = tdy * tileSize
+                }
+            }
         }
     }
 
+    function checkTilesLoaded() {
+
+        var w = width / tileSize
+        var h = height / tileSize
+        var viewx = long2tile(lon, zoom)
+        var viewy = lat2tile(lat, zoom)
+
+        //Find top left corner position, then round down
+        var cornerx = Math.floor(viewx - w * 0.5)
+        var cornery = Math.floor(viewy - h * 0.5)
+
+        //Find bottom right corner position, then round down
+        var corner2x = Math.floor(viewx + w * 0.5)
+        var corner2y = Math.floor(viewy + h * 0.5)
+
+        var component = Qt.createComponent("SlippyTile.qml");
+
+        //Load necessary tiles
+        if(!(zoom in tiles)) tiles[zoom] = {}
+        for(var i = cornerx; i <= corner2x; i++)
+        {
+            if(!(i in tiles[zoom])) tiles[zoom][i] = {}
+            for(var j = cornery; j <= corner2y; j++)
+            {
+                if(!(j in tiles[zoom][i]) || tiles[zoom][i][j] == null)
+                {
+                    var tile = component.createObject(mapArea, {"tx": i, "ty": j})
+                    tiles[zoom][i][j] = tile
+                }
+            }
+        }
+
+        //Unload unnecessary tiles
+        for(var x in tiles[zoom])
+        {
+            //console.log(x)
+            var xrow = tiles[zoom][x]
+            for(var y in xrow)
+            {
+                //console.log(x+","+y)
+                var tile2 = xrow[y]
+                var dest = 0
+                if(x < cornerx || x > corner2x || y < cornery || y > corner2y)
+                    dest = 1
+                if(dest)
+                {
+                    //console.log("Unload: " + tile2.tx + "," + tile2.ty + [x, y, cornerx, cornery, corner2x, corner2y])
+                    if(tile2 != null)
+                        tile2.destroy()
+                    xrow[y] = null
+                }
+            }
+
+        }
+
+        //Clean tile tree structure
+        //TODO
+
+    }
+
     onWidthChanged: {
+        checkTilesLoaded()
         repositionTiles()
     }
 
     onHeightChanged:
     {
+        checkTilesLoaded()
         repositionTiles()
     }
 
@@ -124,10 +194,13 @@ Rectangle {
         //Based on http://qt-project.org/doc/qt-4.8/qdeclarativedynamicobjects.html
         var component = Qt.createComponent("SlippyTile.qml");
         var tile = component.createObject(mapArea, {"tx": 2040, "ty": 1366})
-        tiles.push(tile)
-        var tile2 = component.createObject(mapArea, {"tx": 2041, "ty": 1366, "color": "blue"})
-        tiles.push(tile2)
+        tiles[12] = {}
+        tiles[12][2040] = {}
+        tiles[12][2040][1366] = tile
 
+        var tile2 = component.createObject(mapArea, {"tx": 2041, "ty": 1366, "color": "blue"})
+        tiles[12][2041] = {}
+        tiles[12][2041][1366] = tile2
 
     }
 
