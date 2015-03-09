@@ -19,4 +19,10 @@ Rectangle {
         else
             color= "blue"
     }
+
+    function setPos(xIn, yIn){
+        x = xIn - width/2
+        y = yIn - height/2
+    }
+
 }

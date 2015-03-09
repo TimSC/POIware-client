@@ -10,6 +10,8 @@ Rectangle {
     property real lon: -0.6671822
     property int zoom: 12
     property int tileSize: 256
+    property int maxZoom: 18
+    property int minZoom: 0
 
     property var tiles: ({})
     property var prevTouch: ({})
@@ -121,11 +123,13 @@ Rectangle {
             console.log("wheel " + wheel.buttons + "," + wheel.angleDelta)
             if(wheel.angleDelta.y > 0)
             {
-                parent.zoom += 1
+                if(parent.zoom < maxZoom)
+                    parent.zoom += 1
             }
             else
             {
-                parent.zoom -= 1
+                if(parent.zoom > minZoom)
+                    parent.zoom -= 1
             }
 
             checkTilesLoaded()
@@ -218,8 +222,7 @@ Rectangle {
             var mdx = mx - cornerx
             var mdy = my - cornery
 
-            marker.x = mdx * tileSize
-            marker.y = mdy * tileSize
+            marker.setPos(mdx * tileSize, mdy * tileSize)
         }
     }
 
