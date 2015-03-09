@@ -11,5 +11,6 @@
         <file>SlippyTile.qml</file>
         <file>SlippyMarker.qml</file>
         <file>PoiList.qml</file>
+        <file>ParseGpx.qml</file>
     </qresource>
 </RCC>
