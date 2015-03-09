@@ -140,7 +140,7 @@ ApplicationWindow {
 
         viewButton.onClicked:
         {
-            viewPoi(currentPoi)
+            viewPoi(selectedPoi)
         }
 
         syncButton.onClicked:
@@ -168,7 +168,7 @@ ApplicationWindow {
 
             onSelectedMarkerChanged: {
                 poiList.setCurrentPoiid(selectedMarker)
-
+                parent.selectedPoi = selectedMarker
                 parent.updateLowerBarInfo(selectedMarker)
             }
         }
@@ -180,6 +180,7 @@ ApplicationWindow {
             onCurrentPoiidChanged: {
                 slippyMap.setSelectedMarker(currentPoiid)
                 slippyMap.centreOnMarker(currentPoiid)
+                parent.selectedPoi = currentPoiid
 
                 parent.updateLowerBarInfo(currentPoiid)
             }
