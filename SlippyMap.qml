@@ -13,6 +13,7 @@ Rectangle {
 
     property var tiles: ({})
     property var prevTouch: ({})
+    property var markers: ({})
 
     MultiPointTouchArea {
         anchors.fill: parent
@@ -97,6 +98,7 @@ Rectangle {
 
             checkTilesLoaded()
             repositionTiles()
+            repositionMarkers()
         }
 
     }
@@ -114,6 +116,7 @@ Rectangle {
 
         checkTilesLoaded()
         repositionTiles()
+        repositionMarkers()
     }
 
     //From http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
@@ -159,6 +162,32 @@ Rectangle {
                     tile.visible = (z == zoom)
                 }
             }
+        }
+    }
+
+    function repositionMarkers(){
+        var w = width / tileSize
+        var h = height / tileSize
+        //console.log("Tile size: "+ w +","+ h)
+
+        var viewx = long2tile(lon, zoom)
+        var viewy = lat2tile(lat, zoom)
+
+        //Find top left corner position
+        var cornerx = viewx - w * 0.5
+        var cornery = viewy - h * 0.5
+
+        for(var markerId in markers)
+        {
+            var marker = markers[markerId]
+            var mx = long2tile(marker.lon, zoom)
+            var my = lat2tile(marker.lat, zoom)
+
+            var mdx = mx - cornerx
+            var mdy = my - cornery
+
+            marker.x = mdx * tileSize
+            marker.y = mdy * tileSize
         }
     }
 
@@ -266,15 +295,38 @@ Rectangle {
 
     }
 
+    function addMarker(markerId, lat, lon) {
+
+        if(markerId in markers)
+            removeMarker(markerId)
+
+        var component = Qt.createComponent("SlippyMarker.qml");
+        //Based on http://qt-project.org/doc/qt-4.8/qdeclarativedynamicobjects.html
+        var mark = component.createObject(mapArea, {"lat": lat, "lon": lon})
+        markers[markerId] = mark
+    }
+
+    function removeMarker(markerId) {
+
+
+    }
+
+    function removeAllMarkers() {
+
+    }
+
+
     onWidthChanged: {
         checkTilesLoaded()
         repositionTiles()
+        repositionMarkers()
     }
 
     onHeightChanged:
     {
         checkTilesLoaded()
         repositionTiles()
+        repositionMarkers()
     }
 
 

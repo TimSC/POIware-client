@@ -202,6 +202,10 @@ ApplicationWindow {
             id: slippyMap
             visible: false
             anchors.fill: parent.centralArea
+
+            Component.onCompleted: {
+                addMarker(1, 51.272286, -0.6671822)
+            }
         }
 
         function getTextFromNode(xmlNode)
