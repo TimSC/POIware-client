@@ -329,6 +329,7 @@ Rectangle {
 
     function addMarker(markerId, lat, lon) {
 
+        //console.log(lat+","+lon)
         if(markerId in markers)
             removeMarker(markerId)
 
@@ -382,18 +383,8 @@ Rectangle {
             }
         }
 
-        if(selectedMarker!=null)
-        {
-            //Update previous selection
-            var marker = markers[selectedMarker]
-            marker.selected = 0
-        }
-
-        if(bestMarkerId != null)
-        {
-            selectedMarker = bestMarkerId
-            bestMarker.selected = 1
-        }
+        selectedMarker = bestMarkerId
+        setSelectedMarkerFormat(bestMarkerId)
     }
 
     onWidthChanged: {
@@ -419,6 +410,33 @@ Rectangle {
         checkTilesLoaded()
         repositionTiles()
         repositionMarkers()
+    }
+
+    function setSelectedMarkerFormat(newMarkerId) {
+
+        for(var markerId in markers)
+        {
+            //Update previous selection
+            var marker = markers[markerId]
+            marker.selected = 0
+        }
+
+        if(newMarkerId != null)
+        {
+            var marker = markers[newMarkerId]
+            marker.selected = 1
+        }
+    }
+
+    function setSelectedMarker(newMarkerId){
+        setSelectedMarkerFormat(newMarkerId)
+    }
+
+    function centreOnMarker(markerId){
+        if(markerId == null) return
+        var marker = markers[markerId]
+        lat = marker.lat
+        lon = marker.lon
     }
 
     Component.onCompleted:

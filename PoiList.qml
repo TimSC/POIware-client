@@ -7,6 +7,8 @@ Item {
 
     property real lat: lat
     property real lon: lon
+    property var currentPoiid: null
+    property var poiToView: null
 
     ListModel
     {
@@ -52,7 +54,7 @@ Item {
     ListView {
         id: nearbyList
         anchors.top: latText.bottom
-        anchors.topMargin: 0
+        anchors.topMargin: 5
 
         anchors.leftMargin: 0
         anchors.left: parent.left
@@ -65,6 +67,7 @@ Item {
         clip: true
         highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
         highlightFollowsCurrentItem: true
+        property int genEvents: 1
 
         delegate: Item
         {
@@ -93,16 +96,23 @@ Item {
                 hoverEnabled: true
 
                 onClicked: {
-                    //console.log("test1");
+                    //Changes the list to show selected item
                     container.ListView.view.currentIndex = index
                 }
 
                 onDoubleClicked: {
+                    //Changes the list to show selected item
                     container.ListView.view.currentIndex = index
                     var item = nearbyModel.get(index)
-                    nearbyForm.viewPoi(item.poiid)
+                    nearbyList.parent.poiToView = item.poiid
                 }
             }
+        }
+
+        onCurrentIndexChanged: {
+            var item = nearbyModel.get(nearbyList.currentIndex)
+            if(genEvents)
+                parent.currentPoiid = item.poiid
         }
     }
 
@@ -114,12 +124,7 @@ Item {
         nearbyModel.append(item)
     }
 
-    function getCurrentPoiid(){
-        var item = nearbyModel.get(nearbyList.currentIndex)
-        return item.poiid
-    }
-
-    function setCurrentPoiid(poiid){
+    function setCurrentPoiid(poiid) {
         var index = null
         for(var i=0;i < nearbyModel.count; i++)
         {
@@ -131,9 +136,13 @@ Item {
             }
         }
         if(index != null)
+        {
+            nearbyList.genEvents = 0
             nearbyList.currentIndex = index
+            nearbyList.genEvents = 1
+        }
 
-        console.log("changed!"+poiid)
+        console.log("PoiList setCurrentPoiid"+poiid)
     }
 
     onLatChanged:{

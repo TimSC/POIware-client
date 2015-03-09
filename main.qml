@@ -51,6 +51,8 @@ ApplicationWindow {
 
         property real currentLat: 52.
         property real currentLon: -1.15
+        property var currentResults: null
+        property var selectedPoi: null
         anchors.rightMargin: 0
         anchors.bottomMargin: 0
         anchors.leftMargin: 0
@@ -116,17 +118,10 @@ ApplicationWindow {
             poiView.poiid = poiid
             poiView.visible = true
             nearbyForm.visible = false
-            slippyMap.visible = false
         }
 
         function startQuery(lat, lon){
             httpQuery.go(lat, lon)
-
-            /*slippyMap.lat = currentLat
-            slippyMap.lon = currentLon
-
-            poiList.lat = currentLat
-            poiList.lon = currentLon*/
         }
 
         viewMapButton.onClicked:
@@ -145,13 +140,25 @@ ApplicationWindow {
 
         viewButton.onClicked:
         {
-            var poiid = poiList.getCurrentPoiid()
-            viewPoi(poiid)
+            viewPoi(currentPoi)
         }
 
         syncButton.onClicked:
         {
 
+        }
+
+        function updateLowerBarInfo(poiid)
+        {
+            if(poiid != null)
+            {
+                var record = currentResults[poiid]
+                //console.log(record.name)
+                titleText.text = record.name
+                titleText.cursorPosition = 0
+                descriptionText.text = record.name
+                descriptionText.cursorPosition = 0
+            }
         }
 
         SlippyMap{
@@ -160,14 +167,28 @@ ApplicationWindow {
             anchors.fill: parent.centralArea
 
             onSelectedMarkerChanged: {
-                //console.log("changed!")
                 poiList.setCurrentPoiid(selectedMarker)
+
+                parent.updateLowerBarInfo(selectedMarker)
             }
         }
 
         PoiList {
             id: poiList
             anchors.fill: parent.centralArea
+
+            onCurrentPoiidChanged: {
+                slippyMap.setSelectedMarker(currentPoiid)
+                slippyMap.centreOnMarker(currentPoiid)
+
+                parent.updateLowerBarInfo(currentPoiid)
+            }
+
+            onPoiToViewChanged:
+            {
+                //parent.updateLowerBarInfo(poiToView)
+                parent.viewPoi(poiToView)
+            }
         }
 
         ParseGpx{
@@ -203,7 +224,8 @@ ApplicationWindow {
             //Sort POIs by distance
             poiDistList.sort(function(a, b){return a["dist"]-b["dist"]})
 
-            //Update the UI model
+            //Update the UI models
+            currentResults = {}
             poiList.clear()
             slippyMap.removeAllMarkers()
             for(var i=0;i< poiDistList.length; i++)
@@ -222,6 +244,8 @@ ApplicationWindow {
                 poiList.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item.poiid})
 
                 slippyMap.addMarker(item.poiid, item.lat, item.lon)
+
+                currentResults[item.poiid] = item
             }
 
         }

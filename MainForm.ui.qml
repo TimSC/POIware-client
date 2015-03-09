@@ -23,7 +23,7 @@ Item {
 
     RowLayout {
         id: bottomRowLayout
-        y: 359
+        y: 421
         height: 60
         scale: 1
         anchors.right: parent.right
@@ -31,7 +31,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 0
+        anchors.bottomMargin: -1
 
         Button {
             id: viewButton
@@ -45,29 +45,34 @@ Item {
             anchors.topMargin: 5
         }
 
-        Text {
+        TextField {
             id: titleText
-            text: qsTr("Text")
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            height: 20
+            text: qsTr("")
+            font.bold: true
+            clip: true
+            readOnly: true
             anchors.right: viewButton.left
             anchors.rightMargin: 5
-            anchors.top: parent.top
-            anchors.topMargin: 5
             anchors.left: parent.left
             anchors.leftMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
             font.pixelSize: 12
         }
 
-        Text {
+        TextField {
             id: descriptionText
-            text: qsTr("Text")
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            height: 20
+            text: qsTr("")
+            clip: true
+            readOnly: true
             anchors.right: viewButton.left
             anchors.rightMargin: 5
             anchors.left: parent.left
             anchors.leftMargin: 5
-            anchors.top: titleText.bottom
-            anchors.topMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 30
             font.pixelSize: 12
         }
     }
