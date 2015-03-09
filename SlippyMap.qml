@@ -97,9 +97,6 @@ Rectangle {
         var cornerx = viewx - w * 0.5
         var cornery = viewy - h * 0.5
 
-        //var cornerLat = tile2lat(cornery, zoom)
-        //var cornerLon = tile2long(cornerx, zoom)
-
         for(var i=0; i< tiles.length;i++)
         {
             var tile = tiles[i]
@@ -112,6 +109,14 @@ Rectangle {
         }
     }
 
+    onWidthChanged: {
+        repositionTiles()
+    }
+
+    onHeightChanged:
+    {
+        repositionTiles()
+    }
 
 
     Component.onCompleted:
@@ -123,7 +128,7 @@ Rectangle {
         var tile2 = component.createObject(mapArea, {"tx": 2041, "ty": 1366, "color": "blue"})
         tiles.push(tile2)
 
-        repositionTiles()
+
     }
 
 }
