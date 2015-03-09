@@ -11,4 +11,12 @@ Rectangle {
 
     property real lat
     property real lon
+    property int selected
+
+    onSelectedChanged:{
+        if(selected)
+            color= "yellow"
+        else
+            color= "blue"
+    }
 }

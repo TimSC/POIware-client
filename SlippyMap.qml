@@ -14,19 +14,23 @@ Rectangle {
     property var tiles: ({})
     property var prevTouch: ({})
     property var markers: ({})
+    property real gestureThreshold: 5
+    property var inGesture: ({})
+    property var selectedMarker: null
 
     MultiPointTouchArea {
         anchors.fill: parent
-        mouseEnabled: false
+        mouseEnabled: true
 
         onPressed:{
-            console.log("pressed " + touchPoints.length)
+            //console.log("pressed " + touchPoints.length)
 
             for(var i =0; i <touchPoints.length;i++)
             {
                 var tp = touchPoints[i]
                 //console.log(tp.pointId)
                 prevTouch[tp.pointId] = [tp.x, tp.y]
+                inGesture[tp.pointId] = 0
             }
         }
 
@@ -36,8 +40,14 @@ Rectangle {
             for(var i =0; i <touchPoints.length;i++)
             {
                 var tp = touchPoints[i]
-                //console.log(tp.pointId)
+
+                if(!inGesture[tp.pointId])
+                {
+                    parent.handleClick(tp.x, tp.y)
+                }
+
                 prevTouch[tp.pointId] = null
+                inGesture[tp.pointId] = 0
             }
         }
 
@@ -50,10 +60,16 @@ Rectangle {
 
                 var dx = tp.x - prevTouch[tp.pointId][0]
                 var dy = tp.y - prevTouch[tp.pointId][1]
+                var mag = Math.pow(dx*dx + dy*dy, 0.5)
+                if(mag > gestureThreshold)
+                    inGesture = 1
 
                 //console.log("move " + tp.x + "," + tp.y + ";" + dx + "," + dy)
-                translateMap(dx, dy)
-                prevTouch[tp.pointId] = [tp.x, tp.y]
+                if(inGesture)
+                {
+                    translateMap(dx, dy)
+                    prevTouch[tp.pointId] = [tp.x, tp.y]
+                }
             }
         }
 
@@ -63,6 +79,8 @@ Rectangle {
         id: mouseArea
         anchors.fill: parent
         property var prevPos: null
+        property real gestureThreshold: 5
+        property int inGesture: 0
 
         onPositionChanged: {
             //console.log("move " + mouse.x+","+mouse.y)
@@ -70,19 +88,33 @@ Rectangle {
             {
                 var dx = mouse.x - prevPos[0]
                 var dy = mouse.y - prevPos[1]
-                translateMap(dx, dy)
+                var mag = Math.pow(dx*dx + dy*dy, 0.5)
+                if(mag > gestureThreshold)
+                    inGesture = 1
+
+                if(inGesture)
+                   translateMap(dx, dy)
             }
-            prevPos = [mouse.x, mouse.y]
+            if(inGesture)
+                prevPos = [mouse.x, mouse.y]
         }
 
         onPressed: {
             //console.log("pressed " + mouse.button)
             prevPos = [mouse.x, mouse.y]
+            inGesture = 0
         }
 
         onReleased: {
             //console.log("released " + mouse.button)
             prevPos = null
+            if(!inGesture)
+            {
+                //console.log("click " + mouse.button)
+                parent.handleClick(mouse.x, mouse.y)
+            }
+
+            inGesture = 0
         }
 
         onWheel: {
@@ -313,6 +345,9 @@ Rectangle {
         marker.destroy()
         delete markers[markerId]
 
+        if(markerId == selectedMarker)
+            selectedMarker = null
+
         repositionMarkers()
     }
 
@@ -323,8 +358,42 @@ Rectangle {
             marker.destroy()
         }
         markers = {}
+        selectedMarker = null
 
         repositionMarkers()
+    }
+
+    function handleClick(x, y){
+        console.log("click: "+x+","+y)
+
+        var bestMag = null
+        var bestMarkerId = null
+        var bestMarker = null
+        for(var markerId in markers)
+        {
+            var marker = markers[markerId]
+            //console.log(marker.x+","+marker.y)
+            var mag = Math.pow(Math.pow(marker.x - x,2.) + Math.pow(marker.y - y,2.), 0.5)
+            if(bestMag == null || mag < bestMag)
+            {
+                bestMag = mag
+                bestMarkerId = markerId
+                bestMarker = marker
+            }
+        }
+
+        if(selectedMarker!=null)
+        {
+            //Update previous selection
+            var marker = markers[selectedMarker]
+            marker.selected = 0
+        }
+
+        if(bestMarkerId != null)
+        {
+            selectedMarker = bestMarkerId
+            bestMarker.selected = 1
+        }
     }
 
     onWidthChanged: {
