@@ -16,9 +16,10 @@ Rectangle {
 
     MultiPointTouchArea {
         anchors.fill: parent
+        mouseEnabled: false
 
         onPressed:{
-            //console.log("pressed " + touchPoints.length)
+            console.log("pressed " + touchPoints.length)
 
             for(var i =0; i <touchPoints.length;i++)
             {
@@ -53,6 +54,38 @@ Rectangle {
                 translateMap(dx, dy)
                 prevTouch[tp.pointId] = [tp.x, tp.y]
             }
+        }
+
+    }
+
+    MouseArea{
+        id: mouseArea
+        anchors.fill: parent
+        property var prevPos: null
+
+        onPositionChanged: {
+            console.log("move " + mouse.x+","+mouse.y)
+            if(prevPos != null)
+            {
+                var dx = mouse.x - prevPos[0]
+                var dy = mouse.y - prevPos[1]
+                translateMap(dx, dy)
+            }
+            prevPos = [mouse.x, mouse.y]
+        }
+
+        onPressed: {
+            console.log("pressed " + mouse.button)
+            prevPos = [mouse.x, mouse.y]
+        }
+
+        onReleased: {
+            console.log("released " + mouse.button)
+            prevPos = null
+        }
+
+        onWheel: {
+            console.log("wheel " + wheel.buttons)
         }
 
     }
