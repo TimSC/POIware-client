@@ -202,10 +202,6 @@ ApplicationWindow {
             id: slippyMap
             visible: false
             anchors.fill: parent.centralArea
-
-            Component.onCompleted: {
-                addMarker(1, 51.272286, -0.6671822)
-            }
         }
 
         function getTextFromNode(xmlNode)
@@ -289,7 +285,7 @@ ApplicationWindow {
                 var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
                 var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
 
-                poiDistList.push({"name":item.name, "dist": d, "poiid": item.poiid})
+                poiDistList.push({"name":item.name, "dist": d, "poiid": item.poiid, "lat": item.lat, "lon": item.lon})
             }
             //console.log(poiDistList.length)
 
@@ -298,6 +294,7 @@ ApplicationWindow {
 
             //Update the UI model
             nearbyModel.clear()
+            slippyMap.removeAllMarkers()
             for(var i=0;i< poiDistList.length; i++)
             {
                 var item = poiDistList[i]
@@ -312,6 +309,8 @@ ApplicationWindow {
 
                 //console.log("item" + item)
                 nearbyModel.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item.poiid})
+
+                slippyMap.addMarker(item.poiid, item.lat, item.lon)
             }
 
         }

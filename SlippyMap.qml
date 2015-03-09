@@ -304,17 +304,28 @@ Rectangle {
         //Based on http://qt-project.org/doc/qt-4.8/qdeclarativedynamicobjects.html
         var mark = component.createObject(mapArea, {"lat": lat, "lon": lon})
         markers[markerId] = mark
+
+        repositionMarkers()
     }
 
     function removeMarker(markerId) {
+        var marker = markers[markerId]
+        marker.destroy()
+        delete markers[markerId]
 
-
+        repositionMarkers()
     }
 
     function removeAllMarkers() {
+        for(var markerId in markers)
+        {
+            var marker = markers[markerId]
+            marker.destroy()
+        }
+        markers = {}
 
+        repositionMarkers()
     }
-
 
     onWidthChanged: {
         checkTilesLoaded()
