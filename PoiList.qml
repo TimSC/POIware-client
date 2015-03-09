@@ -115,8 +115,25 @@ Item {
     }
 
     function getCurrentPoiid(){
-        var item = nearbyModel.get(poiList.currentIndex)
+        var item = nearbyModel.get(nearbyList.currentIndex)
         return item.poiid
+    }
+
+    function setCurrentPoiid(poiid){
+        var index = null
+        for(var i=0;i < nearbyModel.count; i++)
+        {
+            var item = nearbyModel.get(i)
+            if(item.poiid == poiid)
+            {
+                index = i
+                break
+            }
+        }
+        if(index != null)
+            nearbyList.currentIndex = index
+
+        console.log("changed!"+poiid)
     }
 
     onLatChanged:{

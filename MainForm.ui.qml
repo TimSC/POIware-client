@@ -13,6 +13,8 @@ Item {
     property alias viewMapButton: viewMapButton
     property alias centralArea: centralArea
     property alias searchButton: searchButton
+    property alias titleText: titleText
+    property alias descriptionText: descriptionText
 
     ColumnLayout {
         id: columnLayout1
@@ -34,13 +36,39 @@ Item {
         Button {
             id: viewButton
             text: qsTr("View")
+            anchors.right: parent.right
+            anchors.rightMargin: 5
             scale: 1
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 5
             anchors.top: parent.top
             anchors.topMargin: 5
+        }
+
+        Text {
+            id: titleText
+            text: qsTr("Text")
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            anchors.right: viewButton.left
+            anchors.rightMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
             anchors.left: parent.left
             anchors.leftMargin: 5
+            font.pixelSize: 12
+        }
+
+        Text {
+            id: descriptionText
+            text: qsTr("Text")
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            anchors.right: viewButton.left
+            anchors.rightMargin: 5
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            anchors.top: titleText.bottom
+            anchors.topMargin: 5
+            font.pixelSize: 12
         }
     }
 

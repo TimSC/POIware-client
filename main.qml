@@ -158,6 +158,11 @@ ApplicationWindow {
             id: slippyMap
             visible: false
             anchors.fill: parent.centralArea
+
+            onSelectedMarkerChanged: {
+                //console.log("changed!")
+                poiList.setCurrentPoiid(selectedMarker)
+            }
         }
 
         PoiList {

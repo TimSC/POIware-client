@@ -364,7 +364,7 @@ Rectangle {
     }
 
     function handleClick(x, y){
-        console.log("click: "+x+","+y)
+        //console.log("click: "+x+","+y)
 
         var bestMag = null
         var bestMarkerId = null
