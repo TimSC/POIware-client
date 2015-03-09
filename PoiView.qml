@@ -218,5 +218,11 @@ PoiViewForm {
         textBearing.text = dstbrng
 
     }
+
+    function getCurrentPoiid()
+    {
+
+
+    }
 }
 

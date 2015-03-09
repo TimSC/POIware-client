@@ -10,5 +10,6 @@
         <file>SlippyMap.qml</file>
         <file>SlippyTile.qml</file>
         <file>SlippyMarker.qml</file>
+        <file>PoiList.qml</file>
     </qresource>
 </RCC>

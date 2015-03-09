@@ -45,18 +45,9 @@ ApplicationWindow {
         }
     }
 
-    ListModel
-    {
-        id: nearbyModel
-    }
-
     MainForm {
         id: nearbyForm
         anchors.fill: parent
-        nearbyList.model: nearbyModel
-        nearbyList.clip: true
-        nearbyList.highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
-        nearbyList.highlightFollowsCurrentItem: true
 
         property real currentLat: 52.
         property real currentLon: -1.15
@@ -137,46 +128,7 @@ ApplicationWindow {
             httpQuery.go()
 
             slippyMap.visible = true
-            nearbyList.visible = false
-        }
-
-        nearbyList.delegate: Item
-        {
-            id: container
-            width: nearbyForm.width; height: 40
-
-            Row {
-                id: row1
-                Rectangle {
-                    width: 40
-                    height: 40
-                    color: colorCode
-                }
-
-                Text {
-                    text: name + ": " + dist
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.fill
-                }
-                spacing: 10
-            }
-
-            MouseArea {
-                id: mouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onClicked: {
-                    //console.log("test1");
-                    container.ListView.view.currentIndex = index
-                }
-
-                onDoubleClicked: {
-                    container.ListView.view.currentIndex = index
-                    var item = nearbyModel.get(index)
-                    nearbyForm.viewPoi(item.poiid)
-                }
-            }
+            poiList.visible = false
         }
 
         function toRadians(deg) {
@@ -189,8 +141,8 @@ ApplicationWindow {
 
         viewButton.onClicked:
         {
-            var item = nearbyModel.get(nearbyList.currentIndex)
-            viewPoi(item.poiid)
+            var poiid = poiList.getCurrentPoiid()
+            viewPoi(poiid)
         }
 
         syncButton.onClicked:
@@ -201,6 +153,11 @@ ApplicationWindow {
         SlippyMap{
             id: slippyMap
             visible: false
+            anchors.fill: parent.centralArea
+        }
+
+        PoiList {
+            id: poiList
             anchors.fill: parent.centralArea
         }
 
@@ -265,19 +222,19 @@ ApplicationWindow {
 
         function processReceivedQueryResult(resultXml)
         {
-            var poiList = []
+            var poiListTmp = []
             if(resultXml != null)
-                poiList = parseGpx(resultXml)
+                poiListTmp = parseGpx(resultXml)
 
-            if(poiList.length == 0)
-               poiList = poiDatabase.queryPois()
+            if(poiListTmp.length == 0)
+               poiListTmp = poiDatabase.queryPois()
 
             //Calculate distance to POIs
             var poiDistList = []
-            console.log(poiList.length)
+            console.log(poiListTmp.length)
 
-            for(var i = 0; i < poiList.length; i++) {
-                var item = poiList[i]
+            for(var i = 0; i < poiListTmp.length; i++) {
+                var item = poiListTmp[i]
 
                 console.log("poiid: " + item.poiid + "," + item.lat + "," + item.lon)
 
@@ -293,7 +250,7 @@ ApplicationWindow {
             poiDistList.sort(function(a, b){return a["dist"]-b["dist"]})
 
             //Update the UI model
-            nearbyModel.clear()
+            poiList.clear()
             slippyMap.removeAllMarkers()
             for(var i=0;i< poiDistList.length; i++)
             {
@@ -308,14 +265,24 @@ ApplicationWindow {
                     colour = "red"
 
                 //console.log("item" + item)
-                nearbyModel.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item.poiid})
+                poiList.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item.poiid})
 
                 slippyMap.addMarker(item.poiid, item.lat, item.lon)
             }
 
         }
 
-        refreshButton.onClicked:
+        Component.onCompleted: {
+            if(positionSource.position.latitudeValid)
+                currentLat = positionSource.position.coordinate.latitude
+
+            if(positionSource.position.longitudeValid)
+                currentLon = positionSource.position.coordinate.longitude
+
+            httpQuery.go()
+        }
+
+        viewListButton.onClicked:
         {
             if(positionSource.position.latitudeValid)
                 currentLat = positionSource.position.coordinate.latitude
@@ -324,10 +291,9 @@ ApplicationWindow {
                 currentLon = positionSource.position.coordinate.longitude
 
             slippyMap.visible = false
-            nearbyList.visible = true
+            poiList.visible = true
 
             httpQuery.go()
-            //populateList()
         }
 
     }
