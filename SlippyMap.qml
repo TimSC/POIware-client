@@ -143,6 +143,7 @@ Rectangle {
             {
                 if(!(j in tiles[zoom][i]) || tiles[zoom][i][j] == null)
                 {
+                    //Based on http://qt-project.org/doc/qt-4.8/qdeclarativedynamicobjects.html
                     var tile = component.createObject(mapArea, {"tx": i, "ty": j})
                     tiles[zoom][i][j] = tile
                 }
@@ -191,16 +192,8 @@ Rectangle {
 
     Component.onCompleted:
     {
-        //Based on http://qt-project.org/doc/qt-4.8/qdeclarativedynamicobjects.html
-        var component = Qt.createComponent("SlippyTile.qml");
-        var tile = component.createObject(mapArea, {"tx": 2040, "ty": 1366})
-        tiles[12] = {}
-        tiles[12][2040] = {}
-        tiles[12][2040][1366] = tile
 
-        var tile2 = component.createObject(mapArea, {"tx": 2041, "ty": 1366, "color": "blue"})
-        tiles[12][2041] = {}
-        tiles[12][2041][1366] = tile2
+
 
     }
 
