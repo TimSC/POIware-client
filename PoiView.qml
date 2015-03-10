@@ -79,29 +79,36 @@ PoiViewForm {
 
         if(resultXml!= null)
         {
-            //Parse POI details
-            for (var i = 0; i < resultXml.attributes.length; ++i) {
-                if(resultXml.attributes[i].name=="poiid") poi["poiid"] = parseInt(resultXml.attributes[i].value)
-                if(resultXml.attributes[i].name=="version") poi["version"] = parseInt(resultXml.attributes[i].value)
-            }
+            for (var n = 0; n < resultXml.childNodes.length; ++n)
+            {
+                var poiNode = resultXml.childNodes[n]
+                if(poiNode.nodeType != 1) continue
+                if(poiNode.nodeName != "poi") continue
 
-            for (var ii = 0; ii < resultXml.childNodes.length; ++ii) {
-                var node = resultXml.childNodes[ii]
-                if(node.nodeType != 1) continue
+                //Parse POI details
+                for (var i = 0; i < poiNode.attributes.length; ++i) {
+                    if(poiNode.attributes[i].name=="poiid") poi["poiid"] = parseInt(poiNode.attributes[i].value)
+                    if(poiNode.attributes[i].name=="version") poi["version"] = parseInt(poiNode.attributes[i].value)
+                }
 
-                var nodeText = getTextFromNode(node)
+                for (var ii = 0; ii < poiNode.childNodes.length; ++ii) {
+                    var node = poiNode.childNodes[ii]
+                    if(node.nodeType != 1) continue
 
-                if(node.nodeName == "name")
-                    poi["name"] = nodeText
-                if(node.nodeName == "lat")
-                    poi["lat"] = parseFloat(nodeText)
-                if(node.nodeName == "lon")
-                    poi["lon"] = parseFloat(nodeText)
-                /*if(node.nodeName == "data")
-                    dstlon = parseFloat(nodeText)
-                if(node.nodeName == "dataset")
-                    dstlon = parseFloat(nodeText)*/
+                    var nodeText = getTextFromNode(node)
 
+                    if(node.nodeName == "name")
+                        poi["name"] = nodeText
+                    if(node.nodeName == "lat")
+                        poi["lat"] = parseFloat(nodeText)
+                    if(node.nodeName == "lon")
+                        poi["lon"] = parseFloat(nodeText)
+                    /*if(node.nodeName == "data")
+                        dstlon = parseFloat(nodeText)
+                    if(node.nodeName == "dataset")
+                        dstlon = parseFloat(nodeText)*/
+
+                }
             }
 
             poiTitle.text = poi["name"]

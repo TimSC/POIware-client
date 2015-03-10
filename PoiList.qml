@@ -10,6 +10,8 @@ Item {
     property var currentPoiid: null
     property var poiToView: null
 
+    property alias downloadAllButton: downloadAllButton
+
     ListModel
     {
         id: nearbyModel
@@ -51,9 +53,22 @@ Item {
         }
     }
 
+    Button {
+        id: downloadAllButton
+        text: qsTr("Download All")
+        scale: 1
+        height: 25
+        width: 100
+
+        anchors.top: latText.bottom
+        anchors.topMargin: 5
+        anchors.leftMargin: 5
+        anchors.left: parent.left
+    }
+
     ListView {
         id: nearbyList
-        anchors.top: latText.bottom
+        anchors.top: downloadAllButton.bottom
         anchors.topMargin: 5
 
         anchors.leftMargin: 0
