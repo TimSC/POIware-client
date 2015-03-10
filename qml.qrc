@@ -13,5 +13,6 @@
         <file>PoiList.qml</file>
         <file>ParseGpx.qml</file>
         <file>ApiMultiPoi.qml</file>
+        <file>ParsePoiXml.qml</file>
     </qresource>
 </RCC>

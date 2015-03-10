@@ -122,8 +122,16 @@ ApplicationWindow {
             }
         }
 
-        function downloadMultiPoisResult(){
-            console.log("x")
+        ParsePoiXml{
+            id: parsePoiXml
+
+        }
+
+        function downloadMultiPoisResult(xml){
+            var pois = parsePoiXml.parse(xml)
+            console.log("Parsed num POIs:"+pois.length)
+
+            poiDatabase.cachePois(pois)
         }
 
 
