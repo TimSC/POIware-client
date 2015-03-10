@@ -51,7 +51,8 @@ ApplicationWindow {
 
         property real currentLat: 52.
         property real currentLon: -1.15
-        property var currentResults: null
+        property var currentResultsByDistance: null
+        property var currentResultsById: null
         property var selectedPoi: null
         anchors.rightMargin: 0
         anchors.bottomMargin: 0
@@ -171,7 +172,7 @@ ApplicationWindow {
         {
             if(poiid != null)
             {
-                var record = currentResults[poiid]
+                var record = currentResultsById[poiid]
                 //console.log(record.name)
                 titleText.text = record.name
                 titleText.cursorPosition = 0
@@ -238,7 +239,7 @@ ApplicationWindow {
             downloadAllButton.onClicked:
             {
                 var keys =[]
-                for(var k in parent.currentResults)
+                for(var k in parent.currentResultsById)
                     keys.push(k)
                 multiPoiQuery.go(keys)
 
@@ -247,7 +248,7 @@ ApplicationWindow {
             clearAllButton.onClicked:
             {
                 var keys =[]
-                for(var k in parent.currentResults)
+                for(var k in parent.currentResultsById)
                     keys.push(k)
                 poiDatabase.clearPois(keys)
                 parent.updatePoisFromCurrentResult()
@@ -297,13 +298,13 @@ ApplicationWindow {
             poiDistList.sort(function(a, b){return a["dist"]-b["dist"]})
 
             //Index POIs by id
-            currentResults = {}
+            currentResultsById = {}
+            currentResultsByDistance = poiDistList
             for(var i=0;i< poiDistList.length; i++)
             {
                 var item = poiDistList[i]
-                currentResults[item.poiid] = item
+                currentResultsById[item.poiid] = item
             }
-
 
             updatePoisFromCurrentResult()
         }
@@ -312,9 +313,9 @@ ApplicationWindow {
             //Update the UI models
             poiList.clear()
             slippyMap.removeAllMarkers()
-            for(var k in currentResults)
+            for(var i =0; i< currentResultsByDistance.length; i++)
             {
-                var item = currentResults[k]
+                var item = currentResultsByDistance[i]
 
                 //Check if this POI has been cached
                 //console.log(item.poiid)

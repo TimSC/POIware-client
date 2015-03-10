@@ -24,7 +24,7 @@ Rectangle {
 
         onStatusChanged:{
             if(status != Image.Ready) return
-            console.log("image status changed: " + status)
+            //console.log("image status changed: " + status)
         }
 
     }

@@ -185,7 +185,7 @@ Item {
             nearbyList.genEvents = 1
         }
 
-        console.log("PoiList setCurrentPoiid"+poiid)
+        //console.log("PoiList setCurrentPoiid"+poiid)
     }
 
     onLatChanged:{
