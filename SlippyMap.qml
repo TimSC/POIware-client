@@ -13,6 +13,10 @@ Rectangle {
     property int maxZoom: 18
     property int minZoom: 0
 
+    property real currentLat
+    property real currentLon
+    property real currentHeading
+
     property var tiles: ({})
     property var markers: ({})
     property var selectedMarker: null
@@ -139,6 +143,12 @@ Rectangle {
 
     }
 
+    SlippyMarker {
+        id: currentPosMarker
+        color: "green"
+        visible: false
+    }
+
     function translateMap(dx, dy){
 
         var viewx = long2tile(lon, zoom)
@@ -224,6 +234,17 @@ Rectangle {
 
             marker.setPos(mdx * tileSize, mdy * tileSize)
         }
+
+        //Update current position
+        var marker = currentPosMarker
+        var mx = long2tile(currentLon, zoom)
+        var my = lat2tile(currentLat, zoom)
+
+        var mdx = mx - cornerx
+        var mdy = my - cornery
+
+        marker.setPos(mdx * tileSize, mdy * tileSize)
+
     }
 
     function checkTilesLoaded() {
@@ -446,6 +467,22 @@ Rectangle {
     function centreOnPosition(latIn, lonIn){
         lat = latIn
         lon = lonIn
+    }
+
+    function setCurrentPos(posInfo)
+    {
+        if(posInfo.latitudeValid)
+        {
+            currentPosMarker.visible = true
+            currentLat = posInfo.coordinate.latitude
+        }
+
+        if(posInfo.longitudeValid)
+            currentLon = posInfo.coordinate.longitude
+    }
+
+    function setCurrentHeading(headingIn){
+        currentHeading = headingIn
     }
 
     Component.onCompleted:

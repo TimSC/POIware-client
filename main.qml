@@ -30,6 +30,7 @@ ApplicationWindow {
         id: compass
         onMagChange: {
             poiView.setHeading(bearing)
+            slippyMap.setCurrentHeading(bearing)
         }
     }
 
@@ -42,6 +43,7 @@ ApplicationWindow {
             var pos = positionSource.position
             //console.log("Position changed: " + pos.coordinate)
             poiView.updatePosition(pos)
+            slippyMap.setCurrentPos(pos)
         }
     }
 
