@@ -114,7 +114,7 @@ ApplicationWindow {
         }
 
         function viewPoi(poiid) {
-
+            if(poiid === null) return
             poiView.poiid = poiid
             poiView.visible = true
             nearbyForm.visible = false

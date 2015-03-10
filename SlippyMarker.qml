@@ -25,4 +25,8 @@ Rectangle {
         y = yIn - height/2
     }
 
+    function getPos(){
+        return [x + width/2, y + height/2]
+    }
+
 }

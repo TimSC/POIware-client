@@ -16,7 +16,7 @@ Rectangle {
     property var tiles: ({})
     property var prevTouch: ({})
     property var markers: ({})
-    property real gestureThreshold: 5
+    property real gestureThreshold: 10
     property var inGesture: ({})
     property var selectedMarker: null
 
@@ -377,7 +377,8 @@ Rectangle {
         {
             var marker = markers[markerId]
             //console.log(marker.x+","+marker.y)
-            var mag = Math.pow(Math.pow(marker.x - x,2.) + Math.pow(marker.y - y,2.), 0.5)
+            var markerPos = marker.getPos()
+            var mag = Math.pow(Math.pow(markerPos[0] - x,2.) + Math.pow(markerPos[1] - y,2.), 0.5)
             if(bestMag == null || mag < bestMag)
             {
                 bestMag = mag
