@@ -12,6 +12,7 @@ Item {
 
     property alias downloadAllButton: downloadAllButton
     property alias clearAllButton: clearAllButton
+    property alias updatePositionButton: updatePositionButton
 
     ListModel
     {
@@ -78,6 +79,19 @@ Item {
         anchors.topMargin: 5
         anchors.leftMargin: 5
         anchors.left: downloadAllButton.right
+    }
+
+    Button {
+        id: updatePositionButton
+        text: qsTr("Update\nPosition")
+        scale: 1
+        height: 50
+        width: 100
+
+        anchors.top: latText.bottom
+        anchors.topMargin: 5
+        anchors.leftMargin: 5
+        anchors.left: clearAllButton.right
     }
 
     ListView {

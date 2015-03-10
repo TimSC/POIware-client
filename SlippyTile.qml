@@ -21,5 +21,12 @@ Rectangle {
             tmp = tmp.replace("{y}", ty)
             return tmp.replace("{z}", tzoom)
         }
+
+        onStatusChanged:{
+            if(status != Image.Ready) return
+            console.log("image status changed: " + status)
+        }
+
     }
+
 }

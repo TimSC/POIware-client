@@ -185,6 +185,31 @@ ApplicationWindow {
             visible: false
             anchors.fill: parent.centralArea
 
+            Button {
+                id: centreMap
+                text: qsTr("Centre\nMap")
+                width:50
+                height:50
+                z:10
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.top: parent.top
+                anchors.topMargin: 5
+
+                onClicked: {
+                    var latVal = parent.lat
+                    var lonVal = parent.lon
+
+                    if(positionSource.position.latitudeValid)
+                        latVal = positionSource.position.coordinate.latitude
+
+                    if(positionSource.position.longitudeValid)
+                        lonVal = positionSource.position.coordinate.longitude
+
+                    parent.centreOnPosition(latVal, lonVal)
+                }
+            }
+
             onSelectedMarkerChanged: {
                 poiList.setCurrentPoiid(selectedMarker)
                 parent.selectedPoi = selectedMarker
@@ -227,6 +252,15 @@ ApplicationWindow {
                 poiDatabase.clearPois(keys)
                 parent.updatePoisFromCurrentResult()
             }
+
+            updatePositionButton.onClicked: {
+                if(positionSource.position.latitudeValid)
+                    lat = positionSource.position.coordinate.latitude
+
+                if(positionSource.position.longitudeValid)
+                    lon = positionSource.position.coordinate.longitude
+            }
+
         }
 
         ParseGpx{
@@ -325,11 +359,6 @@ ApplicationWindow {
         }
 
         searchButton.onClicked: {
-            /*if(positionSource.position.latitudeValid)
-                currentLat = positionSource.position.coordinate.latitude
-
-            if(positionSource.position.longitudeValid)
-                currentLon = positionSource.position.coordinate.longitude*/
 
             var queryLat = 51.
             var queryLon = -1.

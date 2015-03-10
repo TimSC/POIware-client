@@ -14,15 +14,15 @@ Rectangle {
     property int minZoom: 0
 
     property var tiles: ({})
-    property var prevTouch: ({})
     property var markers: ({})
-    property real gestureThreshold: 10
-    property var inGesture: ({})
     property var selectedMarker: null
 
     MultiPointTouchArea {
         anchors.fill: parent
         mouseEnabled: true
+        property real gestureThreshold: 30
+        property var prevTouch: ({})
+        property var inGesture: ({})
 
         onPressed:{
             //console.log("pressed " + touchPoints.length)
@@ -441,6 +441,11 @@ Rectangle {
         var marker = markers[markerId]
         lat = marker.lat
         lon = marker.lon
+    }
+
+    function centreOnPosition(latIn, lonIn){
+        lat = latIn
+        lon = lonIn
     }
 
     Component.onCompleted:
