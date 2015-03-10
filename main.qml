@@ -132,8 +132,8 @@ ApplicationWindow {
             console.log("Parsed num POIs:"+pois.length)
 
             poiDatabase.cachePois(pois)
+            updatePoisFromCurrentResult()
         }
-
 
         function viewPoi(poiid) {
             if(poiid === null) return
@@ -216,6 +216,7 @@ ApplicationWindow {
                 for(var k in parent.currentResults)
                     keys.push(k)
                 multiPoiQuery.go(keys)
+
             }
 
             clearAllButton.onClicked:
@@ -224,6 +225,7 @@ ApplicationWindow {
                 for(var k in parent.currentResults)
                     keys.push(k)
                 poiDatabase.clearPois(keys)
+                parent.updatePoisFromCurrentResult()
             }
         }
 
@@ -260,13 +262,25 @@ ApplicationWindow {
             //Sort POIs by distance
             poiDistList.sort(function(a, b){return a["dist"]-b["dist"]})
 
-            //Update the UI models
+            //Index POIs by id
             currentResults = {}
-            poiList.clear()
-            slippyMap.removeAllMarkers()
             for(var i=0;i< poiDistList.length; i++)
             {
                 var item = poiDistList[i]
+                currentResults[item.poiid] = item
+            }
+
+
+            updatePoisFromCurrentResult()
+        }
+
+        function updatePoisFromCurrentResult(){
+            //Update the UI models
+            poiList.clear()
+            slippyMap.removeAllMarkers()
+            for(var k in currentResults)
+            {
+                var item = currentResults[k]
 
                 //Check if this POI has been cached
                 //console.log(item.poiid)
@@ -280,10 +294,7 @@ ApplicationWindow {
                 poiList.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item.poiid})
 
                 slippyMap.addMarker(item.poiid, item.lat, item.lon)
-
-                currentResults[item.poiid] = item
             }
-
         }
 
         Component.onCompleted: {
