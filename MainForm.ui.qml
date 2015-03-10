@@ -9,7 +9,6 @@ Item {
 
     property alias viewListButton: viewListButton
     property alias viewButton: viewButton
-    property alias syncButton: syncButton
     property alias viewMapButton: viewMapButton
     property alias centralArea: centralArea
     property alias searchButton: searchButton
@@ -57,7 +56,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 5
             anchors.top: parent.top
-            anchors.topMargin: 5
+            anchors.topMargin: 0
             font.pixelSize: 12
         }
 
@@ -96,19 +95,8 @@ Item {
             anchors.bottomMargin: 5
             anchors.top: parent.top
             anchors.topMargin: 5
-            anchors.left: syncButton.right
-            anchors.leftMargin: 5
-        }
-
-        Button {
-            id: syncButton
-            text: qsTr("Sync")
             anchors.left: parent.left
             anchors.leftMargin: 5
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 5
-            anchors.top: parent.top
-            anchors.topMargin: 5
         }
 
         Button {

@@ -143,11 +143,6 @@ ApplicationWindow {
             viewPoi(selectedPoi)
         }
 
-        syncButton.onClicked:
-        {
-
-        }
-
         function updateLowerBarInfo(poiid)
         {
             if(poiid != null)

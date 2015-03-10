@@ -15,9 +15,9 @@ Item {
         id: nearbyModel
     }
 
-    TextArea {
+    TextField {
         id: latText
-        height: 50
+        height: 25
         width: 200
         text: "lat"
         anchors.top: parent.top
@@ -33,9 +33,9 @@ Item {
         }
     }
 
-    TextArea {
+    TextField {
         id: lonText
-        height: 50
+        height: 25
         width: 200
         text: "lon"
         anchors.top: parent.top
