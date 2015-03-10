@@ -113,55 +113,19 @@ ApplicationWindow {
             }
         }
 
-        Item {
+        ApiMultiPoi{
             id: multiPoiQuery
-            function receivedResult(http) { // Call a function when the state changes.
 
-                if (http.status == 200 || http.status == 0)
-                {
-                    if(http.responseXML != null)
-                    {
-                        var actualXml = http.responseXML.documentElement;
-                        parent.processReceivedQueryResult(actualXml)
-                    }
-                    else
-                        parent.processReceivedQueryResult(null)
-                }
-                else
-                {
-                    //console.log("HTTP status:"+http.status+ " "+http.statusText)
-                }
-            }
+            onXmlResponseChanged: {
 
-            function go(lat, lon)
-            {
-                var http = new XMLHttpRequest()
-                var url = "http://gis.kinatomic.com/POIware/api"
-                var params = "lat="+lat+"&lon="+lon+"&action=query"
-                var method = "POST"
-                http.open(method, url, true);
-
-                // Send the proper header information along with the request
-                http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                http.setRequestHeader("Content-length", params.length);
-                http.setRequestHeader("Connection", "close");
-
-                http.onreadystatechange = function() { // Call a function when the state changes.
-                    if (http.readyState == XMLHttpRequest.DONE) {
-                        receivedResult(http)
-                    }
-                    else
-                    {
-                        //console.log("HTTP request status: "+http.readyState)
-                    }
-                }
-                if(method == "POST")
-                    http.send(params)
-                else
-                    http.send()
-
+                parent.downloadMultiPoisResult(xmlResponse)
             }
         }
+
+        function downloadMultiPoisResult(){
+            console.log("x")
+        }
+
 
         function viewPoi(poiid) {
             if(poiid === null) return
@@ -238,12 +202,10 @@ ApplicationWindow {
 
             downloadAllButton.onClicked:
             {
-                for(var poiid in parent.currentResults)
-                {
-                    console.log(poiid)
-
-                }
-
+                var keys =[]
+                for(var k in parent.currentResults)
+                    keys.push(k)
+                multiPoiQuery.go(keys)
             }
 
         }

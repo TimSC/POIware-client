@@ -15,50 +15,11 @@ PoiViewForm {
 
     }
 
-    Item {
+    ApiMultiPoi{
         id: httpQuery
-        function receivedResult(http) { // Call a function when the state changes.
-            if (http.status == 200 || http.status == 0)
-            {
-                if(http.responseXML != null)
-                {
-                    var actualXml = http.responseXML.documentElement;
-                    parent.processReceivedPoiResult(actualXml)
-                }
-                else
-                    parent.processReceivedPoiResult(null)
-            }
-            else
-            {
-                console.log("HTTP status:"+http.status+ " "+http.statusText)
-            }
-        }
 
-        function go()
-        {
-            var http = new XMLHttpRequest()
-            var url = "http://gis.kinatomic.com/POIware/api"
-            var params = "poiid="+parent.poiid+"&action=get"
-            var method = "POST"
-            http.open(method, url, true);
-
-            // Send the proper header information along with the request
-            http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            http.setRequestHeader("Content-length", params.length);
-            http.setRequestHeader("Connection", "close");
-
-            http.onreadystatechange = function() { // Call a function when the state changes.
-                if (http.readyState == XMLHttpRequest.DONE) {
-                    receivedResult(http)
-                }
-                else
-                    console.log("HTTP request status: "+http.readyState)
-            }
-            if(method == "POST")
-                http.send(params)
-            else
-                http.send()
-
+        onXmlResponseChanged: {
+            processReceivedPoiResult(xmlResponse)
         }
     }
 
@@ -152,26 +113,7 @@ PoiViewForm {
     {
         console.log("view poi: " + poiid)
 
-        httpQuery.go()
-
-
-        /*var db = LocalStorage.openDatabaseSync("QQmlExampleDB", "1.0", "The Example QML SQL!", 1000000)
-
-        db.transaction(
-            function(tx) {
-                var rs = tx.executeSql('SELECT * FROM pois WHERE rowid = ?;', [poiid]);
-
-                for(var i = 0; i < rs.rows.length; i++) {
-                    var item = rs.rows.item(i)
-
-                    poiTitle.text = item.name
-                    dstlat = item.lat
-                    dstlon = item.lon
-                }
-            }
-        )*/
-
-
+        httpQuery.go([poiid])
     }
 
     function setHeading(bearing) {
