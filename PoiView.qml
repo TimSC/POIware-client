@@ -40,7 +40,7 @@ PoiViewForm {
                 dstlon = pois[0]["lon"]
             }
 
-            poiDatabase.cachePois(pois)
+            //poiDatabase.cachePois(pois)
         }
         else
         {

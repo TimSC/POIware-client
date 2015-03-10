@@ -90,6 +90,8 @@ Item {
         Button {
             id: viewListButton
             text: qsTr("List")
+            checked: true
+            checkable: true
             scale: 1
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 5
@@ -102,6 +104,7 @@ Item {
         Button {
             id: viewMapButton
             text: qsTr("Map")
+            checkable: true
             anchors.top: parent.top
             anchors.topMargin: 5
             anchors.bottom: parent.bottom

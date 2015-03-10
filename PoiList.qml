@@ -11,6 +11,7 @@ Item {
     property var poiToView: null
 
     property alias downloadAllButton: downloadAllButton
+    property alias clearAllButton: clearAllButton
 
     ListModel
     {
@@ -57,13 +58,26 @@ Item {
         id: downloadAllButton
         text: qsTr("Download All")
         scale: 1
-        height: 25
+        height: 50
         width: 100
 
         anchors.top: latText.bottom
         anchors.topMargin: 5
         anchors.leftMargin: 5
         anchors.left: parent.left
+    }
+
+    Button {
+        id: clearAllButton
+        text: qsTr("Clear All")
+        scale: 1
+        height: 50
+        width: 100
+
+        anchors.top: latText.bottom
+        anchors.topMargin: 5
+        anchors.leftMargin: 5
+        anchors.left: downloadAllButton.right
     }
 
     ListView {

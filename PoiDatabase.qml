@@ -75,5 +75,21 @@ Item {
 
         return pois
     }
+
+    function clearPois(pois)
+    {
+        checkSchema()
+
+        db.transaction(
+            function(tx) {
+
+                for(var i=0;i<pois.length;i++)
+                {
+                    var poiid = pois[i]
+                    tx.executeSql('DELETE FROM pois WHERE poiid = ?;', [poiid])
+                }
+            }
+        )
+    }
 }
 

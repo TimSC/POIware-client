@@ -150,6 +150,8 @@ ApplicationWindow {
         {
             slippyMap.visible = true
             poiList.visible = false
+            viewMapButton.checked = true
+            viewListButton.checked = false
         }
 
         function toRadians(deg) {
@@ -216,6 +218,13 @@ ApplicationWindow {
                 multiPoiQuery.go(keys)
             }
 
+            clearAllButton.onClicked:
+            {
+                var keys =[]
+                for(var k in parent.currentResults)
+                    keys.push(k)
+                poiDatabase.clearPois(keys)
+            }
         }
 
         ParseGpx{
@@ -300,6 +309,8 @@ ApplicationWindow {
         {
             slippyMap.visible = false
             poiList.visible = true
+            viewMapButton.checked = false
+            viewListButton.checked = true
         }
 
         searchButton.onClicked: {
