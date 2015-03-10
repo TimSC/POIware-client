@@ -142,6 +142,7 @@ ApplicationWindow {
             if(poiid === null) return
             poiView.poiid = poiid
             poiView.visible = true
+            poiView.focus = true //Needed to catch back button events
             nearbyForm.visible = false
         }
 

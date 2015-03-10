@@ -61,6 +61,7 @@ PoiViewForm {
     }
 
     Keys.onReleased: {
+        console.log("back")
         if (event.key == Qt.Key_Back && visible) {
             event.accepted = true
             poiView.visible = false
