@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>MainForm.ui.qml</file>
-        <file>test.gpx</file>
         <file>PoiView.qml</file>
         <file>PoiViewForm.ui.qml</file>
         <file>MagCompass.qml</file>
@@ -14,5 +13,7 @@
         <file>ParseGpx.qml</file>
         <file>ApiMultiPoi.qml</file>
         <file>ParsePoiXml.qml</file>
+        <file>Filter.qml</file>
+        <file>FilterForm.ui.qml</file>
     </qresource>
 </RCC>

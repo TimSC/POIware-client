@@ -171,6 +171,12 @@ ApplicationWindow {
             viewPoi(selectedPoi)
         }
 
+        filterButton.onClicked: {
+            nearbyForm.visible = false
+            filter.visible = true
+            filter.focus = true
+        }
+
         function updateLowerBarInfo(poiid)
         {
             if(poiid != null)
@@ -405,5 +411,16 @@ ApplicationWindow {
         id: poiView
         visible: false
         anchors.fill: parent
+    }
+
+    Filter {
+        id: filter
+        visible: false
+        anchors.fill: parent
+
+        doneButton.onClicked: {
+            filter.visible = false
+            nearbyForm.visible = true
+        }
     }
 }

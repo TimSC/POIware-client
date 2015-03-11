@@ -14,6 +14,7 @@ Item {
     property alias searchButton: searchButton
     property alias titleText: titleText
     property alias descriptionText: descriptionText
+    property alias filterButton: filterButton
 
     ColumnLayout {
         id: columnLayout1
@@ -122,6 +123,17 @@ Item {
             anchors.bottomMargin: 5
             anchors.top: parent.top
             anchors.topMargin: 5
+        }
+
+        Button {
+            id: filterButton
+            text: qsTr("Filter")
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            anchors.left: searchButton.right
+            anchors.leftMargin: 5
         }
     }
 
