@@ -56,6 +56,7 @@ ApplicationWindow {
         property var currentResultsByDistance: null
         property var currentResultsById: null
         property var selectedPoi: null
+        property var enabledFilters: null
         anchors.rightMargin: 0
         anchors.bottomMargin: 0
         anchors.leftMargin: 0
@@ -86,11 +87,15 @@ ApplicationWindow {
                 }
             }
 
-            function go(lat, lon)
+            function go(lat, lon, enabledFilters)
             {
                 var http = new XMLHttpRequest()
                 var url = "http://gis.kinatomic.com/POIware/api"
                 var params = "lat="+lat+"&lon="+lon+"&action=query"
+
+                if(enabledFilters != null)
+                    params += "&datasets="+enabledFilters.map(String).join()
+
                 var method = "POST"
                 http.open(method, url, true);
 
@@ -132,7 +137,6 @@ ApplicationWindow {
 
         function downloadMultiPoisResult(xml){
             var pois = parsePoiXml.parse(xml)
-            console.log("Parsed num POIs:"+pois.length)
 
             poiDatabase.cachePois(pois)
             updatePoisFromCurrentResult()
@@ -147,7 +151,7 @@ ApplicationWindow {
         }
 
         function startQuery(lat, lon){
-            httpQuery.go(lat, lon)
+            httpQuery.go(lat, lon, enabledFilters)
         }
 
         viewMapButton.onClicked:
@@ -282,6 +286,7 @@ ApplicationWindow {
             var poiListTmp = []
             if(resultXml != null)
                 poiListTmp = parseGpx.parseGpx(resultXml)
+            console.log("Result len: "+poiListTmp.length)
 
             if(poiListTmp.length == 0)
                poiListTmp = poiDatabase.queryPois()
@@ -299,7 +304,7 @@ ApplicationWindow {
                 var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
                 var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
 
-                poiDistList.push({"name":item.name, "dist": d, "poiid": item.poiid, "lat": item.lat, "lon": item.lon})
+                poiDistList.push({"name":item.name, "dist": d, "poiid": parseInt(item.poiid), "lat": item.lat, "lon": item.lon})
             }
             //console.log(poiDistList.length)
 
@@ -322,6 +327,7 @@ ApplicationWindow {
             //Update the UI models
             poiList.clear()
             slippyMap.removeAllMarkers()
+
             for(var i =0; i< currentResultsByDistance.length; i++)
             {
                 var item = currentResultsByDistance[i]
@@ -335,7 +341,7 @@ ApplicationWindow {
                     colour = "red"
 
                 //console.log("item" + item)
-                poiList.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item.poiid})
+                poiList.append({"name":item["name"], "colorCode": colour, "dist": item["dist"], "poiid": item["poiid"]})
 
                 slippyMap.addMarker(item.poiid, item.lat, item.lon)
             }
@@ -368,7 +374,8 @@ ApplicationWindow {
             viewListButton.checked = true
         }
 
-        searchButton.onClicked: {
+        function doSearch()
+        {
 
             var queryLat = 51.
             var queryLon = -1.
@@ -391,8 +398,11 @@ ApplicationWindow {
                 slippyMap.lon = poiList.lon
             }
 
-            console.log(queryLat+","+queryLon)
             startQuery(queryLat, queryLon)
+        }
+
+        searchButton.onClicked: {
+            doSearch()
         }
 
     }
@@ -421,6 +431,8 @@ ApplicationWindow {
         doneButton.onClicked: {
             filter.visible = false
             nearbyForm.visible = true
+            nearbyForm.enabledFilters = getFilters()
+            nearbyForm.doSearch()
         }
     }
 }

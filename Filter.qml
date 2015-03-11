@@ -3,6 +3,7 @@ import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
 
 FilterForm {
+
     ListModel
     {
         id: datasetModel
@@ -10,12 +11,16 @@ FilterForm {
         ListElement {
             name: "Listed buildings"
             datasetId : 1
-            chk: 1
+            chk: true
+            chkOut: true
+            chkIndex: 0
         }
         ListElement {
             name: "Scheduled monuments"
             datasetId : 2
-            chk: 0
+            chk: true
+            chkOut: true
+            chkIndex: 1
         }
     }
 
@@ -30,6 +35,12 @@ FilterForm {
             spacing: 10
             CheckBox {
                 checked: chk
+
+                onClicked: {
+                    var item = datasetModel.get(chkIndex)
+                    item.chkOut = checked
+                    datasetModel.set(chkIndex, item)
+                }
             }
 
             Text {
@@ -40,5 +51,16 @@ FilterForm {
         }
     }
 
-}
+    function getFilters()
+    {
+        var enabled = []
+        for(var i=0;i<datasetModel.count; i++)
+        {
+            var item = datasetModel.get(i)
+            if(!item.chkOut) continue
+            enabled.push(item.datasetId)
 
+        }
+        return enabled
+    }
+}
