@@ -154,7 +154,7 @@ Item {
 
         onCurrentIndexChanged: {
             var item = nearbyModel.get(nearbyList.currentIndex)
-            if(genEvents)
+            if(genEvents && item != null)
                 parent.currentPoiid = item.poiid
         }
     }

@@ -53,6 +53,10 @@ ApplicationWindow {
 
         property real currentLat: 52.
         property real currentLon: -1.15
+
+        property real queryLat: 51.
+        property real queryLon: -1.
+
         property var currentResultsByDistance: null
         property var currentResultsById: null
         property var selectedPoi: null
@@ -287,9 +291,11 @@ ApplicationWindow {
             if(resultXml != null)
                 poiListTmp = parseGpx.parseGpx(resultXml)
             console.log("Result len: "+poiListTmp.length)
+            poiListTmp = []
 
             if(poiListTmp.length == 0)
-               poiListTmp = poiDatabase.queryPois()
+               poiListTmp = poiDatabase.queryPois(queryLat, queryLon, enabledFilters)
+            console.log("Cached result len: "+poiListTmp.length)
 
             //Calculate distance to POIs
             var poiDistList = []
@@ -348,14 +354,15 @@ ApplicationWindow {
         }
 
         Component.onCompleted: {
-            if(positionSource.position.latitudeValid)
-                currentLat = positionSource.position.coordinate.latitude
-
-            if(positionSource.position.longitudeValid)
-                currentLon = positionSource.position.coordinate.longitude
 
             var initLat = 51.
             var initLon = -1.
+
+            if(positionSource.position.latitudeValid)
+                initLat = positionSource.position.coordinate.latitude
+
+            if(positionSource.position.longitudeValid)
+                initLon = positionSource.position.coordinate.longitude
 
             startQuery(initLat, initLon)
 
@@ -376,9 +383,6 @@ ApplicationWindow {
 
         function doSearch()
         {
-
-            var queryLat = 51.
-            var queryLon = -1.
 
             if(slippyMap.visible)
             {

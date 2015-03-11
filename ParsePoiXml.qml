@@ -41,6 +41,8 @@ Item {
                     poi["lat"] = parseFloat(nodeText)
                 if(node.nodeName == "lon")
                     poi["lon"] = parseFloat(nodeText)
+                if(node.nodeName == "dataset")
+                    poi["dataset"] = parseInt(nodeText)
                 /*if(node.nodeName == "data")
                     dstlon = parseFloat(nodeText)
                 if(node.nodeName == "dataset")
