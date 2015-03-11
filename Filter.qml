@@ -32,7 +32,7 @@ FilterForm {
         height: 20
         Row {
             id: row1
-            spacing: 10
+            spacing: 20
             CheckBox {
                 checked: chk
 

@@ -10,6 +10,7 @@ Item {
         db.transaction(
             function(tx) {
                 //tx.executeSql('DROP TABLE pois;')
+
                 // Create the database if it doesn't already exist
                 tx.executeSql('CREATE TABLE IF NOT EXISTS pois(poiid INTEGER PRIMARY KEY, name TEXT, lat REAL, lon REAL, version INTEGER, data TEXT, dataset INT)')
             }

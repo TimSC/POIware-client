@@ -51,8 +51,8 @@ ApplicationWindow {
         id: nearbyForm
         anchors.fill: parent
 
-        property real currentLat: 52.
-        property real currentLon: -1.15
+        //property real currentLat: 52.
+        //property real currentLon: -1.15
 
         property real queryLat: 51.
         property real queryLon: -1.
@@ -291,11 +291,13 @@ ApplicationWindow {
             if(resultXml != null)
                 poiListTmp = parseGpx.parseGpx(resultXml)
             console.log("Result len: "+poiListTmp.length)
-            poiListTmp = []
+            //poiListTmp = []
 
             if(poiListTmp.length == 0)
+            {
                poiListTmp = poiDatabase.queryPois(queryLat, queryLon, enabledFilters)
-            console.log("Cached result len: "+poiListTmp.length)
+               console.log("Cached result len: "+poiListTmp.length)
+            }
 
             //Calculate distance to POIs
             var poiDistList = []
@@ -307,7 +309,7 @@ ApplicationWindow {
                 //console.log("poiid: " + item.poiid + "," + item.lat + "," + item.lon)
 
                 //Based on http://www.movable-type.co.uk/scripts/latlong.html
-                var φ1 = toRadians(item.lat), φ2 = toRadians(currentLat), Δλ = toRadians(currentLon-item.lon), R = 6371000.; // gives d in metres
+                var φ1 = toRadians(item.lat), φ2 = toRadians(queryLat), Δλ = toRadians(queryLon-item.lon), R = 6371000.; // gives d in metres
                 var d = Math.acos( Math.sin(φ1)*Math.sin(φ2) + Math.cos(φ1)*Math.cos(φ2) * Math.cos(Δλ) ) * R;
 
                 poiDistList.push({"name":item.name, "dist": d, "poiid": parseInt(item.poiid), "lat": item.lat, "lon": item.lon})
@@ -355,22 +357,22 @@ ApplicationWindow {
 
         Component.onCompleted: {
 
-            var initLat = 51.
-            var initLon = -1.
+            queryLat = 51.
+            queryLon = -1.
 
             if(positionSource.position.latitudeValid)
-                initLat = positionSource.position.coordinate.latitude
+                queryLat = positionSource.position.coordinate.latitude
 
             if(positionSource.position.longitudeValid)
-                initLon = positionSource.position.coordinate.longitude
+                queryLon = positionSource.position.coordinate.longitude
 
-            startQuery(initLat, initLon)
+            startQuery(queryLat, queryLon)
 
-            slippyMap.lat = initLat
-            slippyMap.lon = initLon
+            slippyMap.lat = queryLat
+            slippyMap.lon = queryLon
 
-            poiList.lat = initLat
-            poiList.lon = initLon
+            poiList.lat = queryLat
+            poiList.lon = queryLon
         }
 
         viewListButton.onClicked:
