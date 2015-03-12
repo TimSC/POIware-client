@@ -5,11 +5,9 @@
 //http://www.qtcentre.org/threads/1483-Qt4-How-to-load-Url-image-into-QImage
 //http://portal.bluejack.binus.ac.id/tutorials/qtquick20application-qmlandcintegration
 
-QNetworkAccessManager *manager;
-
 FileDownloader::FileDownloader(QQmlContext * ctx) : QObject()
 {
-
+    manager = new QNetworkAccessManager(this);
 }
 
 FileDownloader::~FileDownloader()
@@ -19,10 +17,8 @@ FileDownloader::~FileDownloader()
 
 void FileDownloader::go(QString url)
 {
-    qDebug()<<"test\n";
+    qDebug()<<"go\n";
     QNetworkRequest request;
-    //this->ctxt = ctx;
-    manager = new QNetworkAccessManager(this);
     request.setUrl(QUrl(url));
     manager->get(request);
     connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(fileDownloaded(QNetworkReply*)));

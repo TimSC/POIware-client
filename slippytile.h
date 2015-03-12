@@ -22,8 +22,6 @@ public:
 
     Q_INVOKABLE void go(QString id);
 
-    int Go(QUrl imageUrl, QObject *parent = 0);
-
     virtual ~FileDownloader();
 
     QByteArray downloadedData() const;
@@ -37,9 +35,8 @@ private slots:
 
 private:
 
-
-
     QByteArray m_DownloadedData;
+    QNetworkAccessManager *manager;
 
 };
 
