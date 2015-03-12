@@ -29,10 +29,11 @@ FilterForm {
     datasetListView.delegate: Item {
         x: 5
         width: 80
-        height: 20
+        height: 30
+
         Row {
             id: row1
-            spacing: 20
+            spacing: 30
             CheckBox {
                 checked: chk
 
