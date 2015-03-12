@@ -9,7 +9,7 @@ Rectangle {
     property int tzoom: 12
     //property string url: "http://map.fosm.org/default/{z}/{x}/{y}.png"
     //property string url: "http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png"
-    property string url: "image://colors/yellow"
+    property string url: "image://tiles/yellow"
 
     Image {
         width: 256

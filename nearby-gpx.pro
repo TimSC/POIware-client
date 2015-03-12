@@ -15,3 +15,4 @@ include(deployment.pri)
 
 HEADERS += \
     slippytile.h
+

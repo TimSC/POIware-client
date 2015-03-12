@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include "slippytile.h"
 
 int main(int argc, char *argv[])
@@ -8,7 +9,11 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    QQmlContext *ctxt = engine.rootContext();
+    class FileDownloader mov(ctxt);
+
     engine.addImageProvider(QLatin1String("tiles"), new class TileImageProvider);
+    ctxt->setContextProperty("FileDownloader",&mov);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
