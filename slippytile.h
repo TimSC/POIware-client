@@ -3,10 +3,10 @@
 
 #include <QQuickImageProvider>
 
-class ColorImageProvider : public QQuickImageProvider
+class TileImageProvider : public QQuickImageProvider
 {
 public:
-    ColorImageProvider();
+    TileImageProvider();
 
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
 };

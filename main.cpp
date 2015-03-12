@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    engine.addImageProvider(QLatin1String("colors"), new class ColorImageProvider);
+    engine.addImageProvider(QLatin1String("tiles"), new class TileImageProvider);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
