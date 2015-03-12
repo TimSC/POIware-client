@@ -20,6 +20,8 @@ public:
 
     explicit FileDownloader(QQmlContext * ctx);
 
+    Q_INVOKABLE void go(QString id);
+
     int Go(QUrl imageUrl, QObject *parent = 0);
 
     virtual ~FileDownloader();

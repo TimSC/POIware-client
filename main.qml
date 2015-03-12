@@ -152,6 +152,7 @@ ApplicationWindow {
             poiView.visible = true
             poiView.focus = true //Needed to catch back button events
             nearbyForm.visible = false
+            FileDownloader.go("http://imgs.xkcd.com/comics/new_products.png")
         }
 
         function startQuery(lat, lon){

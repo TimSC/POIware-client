@@ -1,6 +1,6 @@
 #include "slippytile.h"
 #include <QThread>
-#include <assert.h>
+#include <QQmlContext>
 
 //http://www.qtcentre.org/threads/1483-Qt4-How-to-load-Url-image-into-QImage
 //http://portal.bluejack.binus.ac.id/tutorials/qtquick20application-qmlandcintegration
@@ -9,18 +9,23 @@ QNetworkAccessManager *manager;
 
 FileDownloader::FileDownloader(QQmlContext * ctx) : QObject()
 {
-    QNetworkRequest request;
-    //this->ctxt = ctx;
-    manager = new QNetworkAccessManager(this);
-    request.setUrl(QUrl("http://imgs.xkcd.com/comics/new_products.png"));
-    manager->get(request);
-    connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(fileDownloaded(QNetworkReply*)));
 
 }
 
 FileDownloader::~FileDownloader()
 {
 
+}
+
+void FileDownloader::go(QString url)
+{
+    qDebug()<<"test\n";
+    QNetworkRequest request;
+    //this->ctxt = ctx;
+    manager = new QNetworkAccessManager(this);
+    request.setUrl(QUrl(url));
+    manager->get(request);
+    connect(manager,SIGNAL(finished(QNetworkReply*)),this,SLOT(fileDownloaded(QNetworkReply*)));
 }
 
 void FileDownloader::fileDownloaded(QNetworkReply* pReply)
@@ -51,6 +56,7 @@ QPixmap TileImageProvider::requestPixmap(const QString &id, QSize *size, const Q
 
     //class FileDownloader asyncRequest(QUrl("http://imgs.xkcd.com/comics/new_products.png"));
     //QThread::msleep(1000);
+    //QVariant QQmlContext::contextProperty(const QString & name);
 
     if (size)
         *size = QSize(width, height);
