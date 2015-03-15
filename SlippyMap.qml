@@ -9,6 +9,7 @@ Rectangle {
     property real lat: 51.272286
     property real lon: -0.6671822
     property int zoom: 12
+    property int dragActive: 0
     property int tileSize: 256
     property int maxZoom: 18
     property int minZoom: 0
@@ -23,60 +24,114 @@ Rectangle {
 
     MultiPointTouchArea {
         anchors.fill: parent
-        mouseEnabled: true
+        mouseEnabled: false
+        z: 1
         property real gestureThreshold: 30
         property var prevTouch: ({})
+        property var initialTouch: ({})
+        property var currentTouch: ({})
         property var inGesture: ({})
 
         onPressed:{
-            //console.log("pressed " + touchPoints.length)
 
             for(var i =0; i <touchPoints.length;i++)
             {
                 var tp = touchPoints[i]
+                console.log("pressed " + tp.pointId)
                 //console.log(tp.pointId)
                 prevTouch[tp.pointId] = [tp.x, tp.y]
+                initialTouch[tp.pointId] = [tp.x, tp.y]
+                currentTouch[tp.pointId] = [tp.x, tp.y]
                 inGesture[tp.pointId] = 0
             }
         }
 
         onReleased:{
-            //console.log("released " + touchPoints.length)
+
 
             for(var i =0; i <touchPoints.length;i++)
             {
                 var tp = touchPoints[i]
+                console.log("released " + tp.pointId)
 
                 if(!inGesture[tp.pointId])
                 {
                     parent.handleClick(tp.x, tp.y)
                 }
 
-                prevTouch[tp.pointId] = null
-                inGesture[tp.pointId] = 0
+                delete prevTouch[tp.pointId]
+                delete initialTouch[tp.pointId]
+                delete currentTouch[tp.pointId]
+                delete inGesture[tp.pointId]
             }
+
+
         }
 
         onUpdated:{
-            //console.log("updated " + touchPoints.length)
+
+            var keys = Object.keys(initialTouch)
             for(var i =0; i <touchPoints.length;i++)
             {
                 var tp = touchPoints[i]
-                //console.log(tp.pointId)
-
-                var dx = tp.x - prevTouch[tp.pointId][0]
-                var dy = tp.y - prevTouch[tp.pointId][1]
-                var mag = Math.pow(dx*dx + dy*dy, 0.5)
-                if(mag > gestureThreshold)
-                    inGesture = 1
-
-                //console.log("move " + tp.x + "," + tp.y + ";" + dx + "," + dy)
-                if(inGesture)
-                {
-                    translateMap(dx, dy)
-                    prevTouch[tp.pointId] = [tp.x, tp.y]
-                }
+                currentTouch[tp.pointId] = [tp.x, tp.y]
             }
+
+            //Calc initial touch average position
+            var ilx = []
+            var ily = []
+            for(var i =0; i <keys.length;i++)
+            {
+                var it = initialTouch[keys[i]]
+                ilx.push(it[0])
+                ily.push(it[1])
+            }
+            var ix = ilx.reduce(function(a, b) { return a + b; }) / ilx.length
+            var iy = ily.reduce(function(a, b) { return a + b; }) / ily.length
+            console.log("a"+ix+","+iy)
+
+            //Calc current touch average position
+            var clx = []
+            var cly = []
+            for(var i =0; i <keys.length;i++)
+            {
+                var ct = currentTouch[keys[i]]
+                clx.push(ct[0])
+                cly.push(ct[1])
+            }
+            var cx = clx.reduce(function(a, b) { return a + b; }) / clx.length
+            var cy = cly.reduce(function(a, b) { return a + b; }) / cly.length
+            console.log("b"+cx+","+cy)
+
+            console.log("Av Move: "+(cx - ix)+","+(cy - iy))
+
+            //Calc average initial distance
+            var d = []
+            for(var i =0; i <keys.length;i++)
+            {
+                var it = initialTouch[keys[i]]
+                d.push(Math.pow(Math.pow(it[0] - ix, 2.) + Math.pow(it[1] - iy, 2.), 0.5))
+            }
+            var id = d.reduce(function(a, b) { return a + b; }) / d.length
+
+            //Calc current initial distance
+            d = []
+            for(var i =0; i <keys.length;i++)
+            {
+                var it = currentTouch[keys[i]]
+                d.push(Math.pow(Math.pow(it[0] - cx, 2.) + Math.pow(it[1] - cy, 2.), 0.5))
+            }
+            var cd = d.reduce(function(a, b) { return a + b; }) / d.length
+
+
+            console.log("dist:"+ id + ","+ cd)
+            var ddist = 1.
+            if(initDist > 0.)
+                ddist = cd / id
+            console.log("ddist:"+ddist)
+
+
+
         }
 
     }
@@ -99,7 +154,7 @@ Rectangle {
                     inGesture = 1
 
                 if(inGesture)
-                   translateMap(dx, dy)
+                   dragMove(dx, dy, 0)
             }
             if(inGesture)
                 prevPos = [mouse.x, mouse.y]
@@ -149,7 +204,12 @@ Rectangle {
         visible: false
     }
 
-    function translateMap(dx, dy){
+    function dragStart(){
+
+
+    }
+
+    function dragMove(dx, dy, dzoom){
 
         var viewx = long2tile(lon, zoom)
         var viewy = lat2tile(lat, zoom)
@@ -163,6 +223,10 @@ Rectangle {
         checkTilesLoaded()
         repositionTiles()
         repositionMarkers()
+    }
+
+    function dragEnd(){
+
     }
 
     //From http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
