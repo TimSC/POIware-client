@@ -246,11 +246,21 @@ Rectangle {
     function dragMove(dx, dy, dzoom){
         console.log("move:" + dx + "," + dy + "," + dzoom)
 
+        if(dzoom != 1.)
+        {
+            var logZoom = Math.log(dzoom) / Math.log(2)
+            zoom = Math.round(preDragZoom + logZoom)
+            if(zoom > maxZoom)
+                zoom = maxZoom
+            if(zoom < minZoom)
+                zoom = minZoom
+        }
+
         var viewx = long2tile(lon, zoom)
         var viewy = lat2tile(lat, zoom)
 
-        var initx = long2tile(preDragLon, preDragZoom)
-        var inity = lat2tile(preDragLat, preDragZoom)
+        var initx = long2tile(preDragLon, zoom)
+        var inity = lat2tile(preDragLat, zoom)
 
         viewx = initx - dx / tileSize
         viewy = inity - dy / tileSize
