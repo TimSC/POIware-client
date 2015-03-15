@@ -9,6 +9,9 @@ Rectangle {
     property real lat: 51.272286
     property real lon: -0.6671822
     property int zoom: 12
+    property real preDragLat: null
+    property real preDragLon: null
+    property int preDragZoom: null
     property int dragActive: 0
     property int tileSize: 256
     property int maxZoom: 18
@@ -27,10 +30,10 @@ Rectangle {
         mouseEnabled: false
         z: 1
         property real gestureThreshold: 30
-        property var prevTouch: ({})
         property var initialTouch: ({})
         property var currentTouch: ({})
         property var inGesture: ({})
+        property int overallInGesture: 0
 
         onPressed:{
 
@@ -39,10 +42,10 @@ Rectangle {
                 var tp = touchPoints[i]
                 console.log("pressed " + tp.pointId)
                 //console.log(tp.pointId)
-                prevTouch[tp.pointId] = [tp.x, tp.y]
                 initialTouch[tp.pointId] = [tp.x, tp.y]
                 currentTouch[tp.pointId] = [tp.x, tp.y]
                 inGesture[tp.pointId] = 0
+
             }
         }
 
@@ -54,18 +57,22 @@ Rectangle {
                 var tp = touchPoints[i]
                 console.log("released " + tp.pointId)
 
-                if(!inGesture[tp.pointId])
+                if(!overallInGesture)
                 {
                     parent.handleClick(tp.x, tp.y)
                 }
 
-                delete prevTouch[tp.pointId]
                 delete initialTouch[tp.pointId]
                 delete currentTouch[tp.pointId]
                 delete inGesture[tp.pointId]
             }
 
-
+            var keys = Object.keys(initialTouch)
+            if(keys.length == 0 && overallInGesture)
+            {
+                overallInGesture = 0
+                dragEnd()
+            }
         }
 
         onUpdated:{
@@ -77,61 +84,83 @@ Rectangle {
                 currentTouch[tp.pointId] = [tp.x, tp.y]
             }
 
-            //Calc initial touch average position
-            var ilx = []
-            var ily = []
-            for(var i =0; i <keys.length;i++)
+            //Check if in gesture
+            for(var i =0; i <touchPoints.length;i++)
             {
-                var it = initialTouch[keys[i]]
-                ilx.push(it[0])
-                ily.push(it[1])
-            }
-            var ix = ilx.reduce(function(a, b) { return a + b; }) / ilx.length
-            var iy = ily.reduce(function(a, b) { return a + b; }) / ily.length
-            console.log("a"+ix+","+iy)
+                var tp = touchPoints[i]
+                var otp = initialTouch[tp.pointId]
+                var mag = Math.pow(Math.pow(tp.x - otp[0],2.)+Math.pow(tp.y - otp[1],2.),0.5)
+                console.log("mag"+mag)
+                if(mag > gestureThreshold)
+                {
+                    inGesture[tp.pointId] = 1
 
-            //Calc current touch average position
-            var clx = []
-            var cly = []
-            for(var i =0; i <keys.length;i++)
+                    if(!overallInGesture)
+                    {
+                        dragStart()
+                        overallInGesture = 1
+                    }
+                }
+            }
+
+            if(overallInGesture)
             {
-                var ct = currentTouch[keys[i]]
-                clx.push(ct[0])
-                cly.push(ct[1])
+                //Calc initial touch average position
+                var ilx = []
+                var ily = []
+                for(var i =0; i <keys.length;i++)
+                {
+                    var it = initialTouch[keys[i]]
+                    ilx.push(it[0])
+                    ily.push(it[1])
+                }
+                var ix = ilx.reduce(function(a, b) { return a + b; }) / ilx.length
+                var iy = ily.reduce(function(a, b) { return a + b; }) / ily.length
+                //console.log("a"+ix+","+iy)
+
+                //Calc current touch average position
+                var clx = []
+                var cly = []
+                for(var i =0; i <keys.length;i++)
+                {
+                    var ct = currentTouch[keys[i]]
+                    clx.push(ct[0])
+                    cly.push(ct[1])
+                }
+                var cx = clx.reduce(function(a, b) { return a + b; }) / clx.length
+                var cy = cly.reduce(function(a, b) { return a + b; }) / cly.length
+                //console.log("b"+cx+","+cy)
+
+                //console.log("Av Move: "+(cx - ix)+","+(cy - iy))
+
+                //Calc average initial distance
+                var d = []
+                for(var i =0; i <keys.length;i++)
+                {
+                    var it = initialTouch[keys[i]]
+                    d.push(Math.pow(Math.pow(it[0] - ix, 2.) + Math.pow(it[1] - iy, 2.), 0.5))
+                }
+                var id = d.reduce(function(a, b) { return a + b; }) / d.length
+
+                //Calc current initial distance
+                d = []
+                for(var i =0; i <keys.length;i++)
+                {
+                    var it = currentTouch[keys[i]]
+                    d.push(Math.pow(Math.pow(it[0] - cx, 2.) + Math.pow(it[1] - cy, 2.), 0.5))
+                }
+                var cd = d.reduce(function(a, b) { return a + b; }) / d.length
+
+
+                //console.log("dist:"+ id + ","+ cd)
+                var ddist = 1.
+                if(keys.length > 0 && id > 0.)
+                    ddist = cd / id
+                //console.log("ddist:"+ddist)
+
+                dragMove(cx - ix, cy - iy, ddist)
+
             }
-            var cx = clx.reduce(function(a, b) { return a + b; }) / clx.length
-            var cy = cly.reduce(function(a, b) { return a + b; }) / cly.length
-            console.log("b"+cx+","+cy)
-
-            console.log("Av Move: "+(cx - ix)+","+(cy - iy))
-
-            //Calc average initial distance
-            var d = []
-            for(var i =0; i <keys.length;i++)
-            {
-                var it = initialTouch[keys[i]]
-                d.push(Math.pow(Math.pow(it[0] - ix, 2.) + Math.pow(it[1] - iy, 2.), 0.5))
-            }
-            var id = d.reduce(function(a, b) { return a + b; }) / d.length
-
-            //Calc current initial distance
-            d = []
-            for(var i =0; i <keys.length;i++)
-            {
-                var it = currentTouch[keys[i]]
-                d.push(Math.pow(Math.pow(it[0] - cx, 2.) + Math.pow(it[1] - cy, 2.), 0.5))
-            }
-            var cd = d.reduce(function(a, b) { return a + b; }) / d.length
-
-
-            console.log("dist:"+ id + ","+ cd)
-            var ddist = 1.
-            if(initDist > 0.)
-                ddist = cd / id
-            console.log("ddist:"+ddist)
-
-
-
         }
 
     }
@@ -139,42 +168,46 @@ Rectangle {
     MouseArea{
         id: mouseArea
         anchors.fill: parent
-        property var prevPos: null
+        property var initialPos: null
         property real gestureThreshold: 5
         property int inGesture: 0
 
         onPositionChanged: {
             //console.log("move " + mouse.x+","+mouse.y)
-            if(prevPos != null)
+            if(initialPos != null)
             {
-                var dx = mouse.x - prevPos[0]
-                var dy = mouse.y - prevPos[1]
+                var dx = mouse.x - initialPos[0]
+                var dy = mouse.y - initialPos[1]
                 var mag = Math.pow(dx*dx + dy*dy, 0.5)
                 if(mag > gestureThreshold)
+                {
+                    if(!inGesture)
+                        dragStart()
                     inGesture = 1
+                }
 
                 if(inGesture)
-                   dragMove(dx, dy, 0)
+                   dragMove(dx, dy, 1.)
             }
-            if(inGesture)
-                prevPos = [mouse.x, mouse.y]
         }
 
         onPressed: {
             //console.log("pressed " + mouse.button)
-            prevPos = [mouse.x, mouse.y]
+            initialPos = [mouse.x, mouse.y]
             inGesture = 0
         }
 
         onReleased: {
             //console.log("released " + mouse.button)
-            prevPos = null
+            initialPos = null
             if(!inGesture)
             {
                 //console.log("click " + mouse.button)
                 parent.handleClick(mouse.x, mouse.y)
             }
 
+            if(!inGesture)
+                dragEnd()
             inGesture = 0
         }
 
@@ -205,17 +238,22 @@ Rectangle {
     }
 
     function dragStart(){
-
-
+        preDragLat = lat
+        preDragLon = lon
+        preDragZoom = zoom
     }
 
     function dragMove(dx, dy, dzoom){
+        console.log("move:" + dx + "," + dy + "," + dzoom)
 
         var viewx = long2tile(lon, zoom)
         var viewy = lat2tile(lat, zoom)
 
-        viewx -= dx / tileSize
-        viewy -= dy / tileSize
+        var initx = long2tile(preDragLon, preDragZoom)
+        var inity = lat2tile(preDragLat, preDragZoom)
+
+        viewx = initx - dx / tileSize
+        viewy = inity - dy / tileSize
 
         lat = tile2lat(viewy, zoom)
         lon = tile2long(viewx, zoom)
@@ -226,7 +264,9 @@ Rectangle {
     }
 
     function dragEnd(){
-
+        preDragLat = null
+        preDragLon = null
+        preDragZoom = null
     }
 
     //From http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
